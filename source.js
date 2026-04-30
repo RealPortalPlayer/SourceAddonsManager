@@ -19,7 +19,7 @@ const findAddon = mods => {
         if (addon.result !== 1)
             continue
 
-        if (!addon.title.toLowerCase().includes(addonName) && !addon.description.includes(addonName)) {
+        if (!addon.title.toLowerCase().includes(addonName) && !addon.description.toLowerCase().includes(addonName)) {
             let add = false
 
             for (const tag of addon.tags) {
