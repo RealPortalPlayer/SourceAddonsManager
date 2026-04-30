@@ -2,6 +2,7 @@
 // Created on: 4/29/26 @ 11:10 PM
 
 const {basename} = require("path")
+const {writeFileSync} = require("fs")
 
 const removeNewlineEnd = text => text.endsWith("\n") ? text.substring(0, text.length - 1) : text
 
@@ -110,6 +111,25 @@ const main = async () => {
             const addon = addons[0]
 
             console.log(`Downloading: [${addon.publishedfileid}] ${removeNewlineEnd(addon.title)}`)
+
+            const vpk = await fetch(`http://10.0.44.20:5113/Mods/Left 4 Dead 2/${addon.publishedfileid}.vpk`)
+
+            if (!vpk.ok) {
+                console.log("Error while trying to download addon from server")
+                process.exit(1)
+            }
+
+            writeFileSync(`/home/kratcy/.steamapps/common/Left 4 Dead 2/left4dead2/addons/${addon.publishedfileid}.vpk`, await vpk.bytes())
+
+            const jpg = await fetch(`http://10.0.44.20:5113/Mods/Left 4 Dead 2/${addon.publishedfileid}.jpg`)
+
+            if (!jpg.ok) {
+                console.log("Errored while trying to download addon image from server. Was the addon unavailable?")
+                console.log("Addon should still work, but it will not have a image inside the addons menu")
+                process.exit(0)
+            }
+
+            writeFileSync(`/home/kratcy/.steamapps/common/Left 4 Dead 2/left4dead2/addons/${addon.publishedfileid}.jpg`, await jpg.bytes())
             break
         }
 
@@ -119,7 +139,6 @@ const main = async () => {
                 console.log("Missing mod name")
                 process.exit(1)
             }
-
 
             for (const addon of findAddon(mods, true))
                 console.log(`[${addon.publishedfileid}] ${removeNewlineEnd(addon.title)}`)
