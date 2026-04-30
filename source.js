@@ -6,13 +6,12 @@ const {writeFileSync, existsSync, mkdirSync, readdirSync} = require("fs")
 
 const removeNewlineEnd = text => text.endsWith("\n") ? text.substring(0, text.length - 1) : text
 
-const findAddon = (mods, fuzzy) => {
-    let addonName = process.argv
+const findAddon = (mods, shiftTimes, fuzzy) => {
+    let addonName = [...process.argv]
     let addons = []
 
-    addonName.shift()
-    addonName.shift()
-    addonName.shift()
+    for (let i = 0; i < shiftTimes; i++)
+        addonName.shift()
 
     addonName = addonName.join(" ").toLowerCase()
 
@@ -105,7 +104,7 @@ const main = async () => {
                 process.exit(1)
             }
 
-            const addons = findAddon(mods, false)
+            const addons = findAddon(mods, 3, false)
 
             if (addons.length > 1) {
                 console.log("Found more than one addon. Search to narrow it down")
@@ -134,7 +133,7 @@ const main = async () => {
                 process.exit(1)
             }
 
-            for (const addon of findAddon(mods, true))
+            for (const addon of findAddon(mods, 3, true))
                 console.log(`[${addon.publishedfileid}] ${removeNewlineEnd(addon.title)}`)
 
             break
@@ -172,8 +171,32 @@ const main = async () => {
                 }
 
                 case "add":
-                    console.log("Collection add")
+                {
+                    if (process.argv.length <= 4) {
+                        console.log("Missing collection name")
+                        process.exit(1)
+                    }
+
+                    if (!existsSync(`/home/kratcy/.config/sam/${process.argv[4]}.json`)) {
+                        console.error(`Collection does not exists: ${process.argv[4]}`)
+                        process.exit(1)
+                    }
+
+                    let collection = require(`/home/kratcy/.config/sam/${process.argv[4]}.json`)
+
+                    for (const addon of findAddon(mods, 5, true)) {
+                        if (collection.includes(addon.publishedfileid))
+                            continue
+
+                        console.log(`Adding to collection: ${process.argv[4]}, ${addon.publishedfileid}`)
+
+                        collection.push(addon.publishedfileid)
+                    }
+
+                    console.log("Writing new collection file")
+                    writeFileSync(`/home/kratcy/.config/sam/${process.argv[4]}.json`, JSON.stringify(collection))
                     break
+                }
 
                 case "install":
                     console.log("Collection install")
