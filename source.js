@@ -19,6 +19,24 @@ const main = async () => {
     console.log("Getting mods")
 
     const mods = await (await fetch("http://10.0.44.20:5113/Mods/Left 4 Dead 2/data.json")).json()
+
+    switch (process.argv[2]) {
+        case "-I": case "--install":
+            console.log("Install")
+            break
+
+        case "-S": case "--search":
+            console.log("Search")
+            break
+
+        case "-L": case "--list":
+            console.log("List")
+            break
+
+        default:
+            console.error(`Invalid option: ${process.argv[2]}`)
+            process.exit(1)
+    }
 }
 
 main()
