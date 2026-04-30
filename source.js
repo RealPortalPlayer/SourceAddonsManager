@@ -150,7 +150,25 @@ const main = async () => {
 
             switch (process.argv[3]) {
                 case "list":
-                    console.log("Collection list")
+                    for (const collection of readdirSync("/home/kratcy/.config/sam")) {
+                        if (!collection.endsWith(".json"))
+                            continue
+
+                        const json = require(`/home/kratcy/.config/sam/${collection}`)
+
+                        console.log(`${collection.substring(0, collection.length - 5)}:`)
+
+                        for (const addon of json) {
+                            const details = mods.response.publishedfiledetails.filter(found => found.publishedfileid === addon)
+
+                            if (details.length === 0 || details.length > 1) {
+                                console.log(`???????????????? ${details.length}`)
+                                continue
+                            }
+
+                            console.log(`   [${addon}] ${removeNewlineEnd(details[0].title)}`)
+                        }
+                    }
                     break
 
                 case "create":
