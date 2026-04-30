@@ -47,11 +47,10 @@ const main = async () => {
     if (process.argv.length <= 2) {
         const executableName = basename(process.argv[1])
 
-        console.log(`usage:  ${executableName} <operation> [...]`)
-        console.log("operations:")
-        console.log(`    ${executableName} {-I --install}     <mod>`)
-        console.log(`    ${executableName} {-S --search}     <mod>`)
-        console.log(`    ${executableName} {-L --list}`)
+        console.log(`${executableName} <operation> [...]`)
+        console.log("   install <addon>")
+        console.log("   search <addon>")
+        console.log("   list")
         return
     }
 
@@ -61,11 +60,11 @@ const main = async () => {
     const mods = await (await fetch("http://10.0.44.20:5113/Mods/Left 4 Dead 2/data.json")).json()
 
     switch (process.argv[2]) {
-        case "-I": case "--install":
+        case "install":
             console.log("Install")
             break
 
-        case "-S": case "--search":
+        case "search":
             if (process.argv.length <= 3) {
                 console.log("Missing mod name")
                 process.exit(1)
@@ -83,7 +82,7 @@ const main = async () => {
 
             break
 
-        case "-L": case "--list": // TODO: Pages?
+        case "list": // TODO: Pages?
             for (const addon of mods.response.publishedfiledetails) {
                 if (addon.result !== 1)
                     continue
