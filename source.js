@@ -100,10 +100,16 @@ const main = async () => {
                 process.exit(1)
             }
 
-            for (const addon of findAddon(mods, false)) {
-                console.log(`Downloading: [${addon.publishedfileid}] ${removeNewlineEnd(addon.title)}`)
+            const addons = findAddon(mods, false)
+
+            if (addons.length > 1) {
+                console.log("Found more than one addon. Search to narrow it down")
+                process.exit(1)
             }
 
+            const addon = addons[0]
+
+            console.log(`Downloading: [${addon.publishedfileid}] ${removeNewlineEnd(addon.title)}`)
             break
         }
 
