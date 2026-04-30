@@ -5,7 +5,7 @@ const {basename} = require("path")
 
 const removeNewlineEnd = text => text.endsWith("\n") ? text.substring(0, text.length - 1) : text
 
-const findAddon = mods => {
+const findAddon = (mods, fuzzy) => {
     let addonName = process.argv
     let addons = []
 
@@ -15,11 +15,22 @@ const findAddon = mods => {
 
     addonName = addonName.join(" ").toLowerCase()
 
+    let checkTitle = title => title.toLowerCase().includes(addonName)
+    let checkDescription = description => checkTitle(description)
+
+    if (!fuzzy) {
+        checkTitle = title => title.toLowerCase() === addonName
+        checkDescription = description => false
+    }
+
     for (const addon of mods.response.publishedfiledetails) {
         if (addon.result !== 1)
             continue
 
-        if (!addon.title.toLowerCase().includes(addonName) && !addon.description.toLowerCase().includes(addonName)) {
+        if (!checkTitle(addon.title) && !checkDescription(addon.description)) {
+            if (!fuzzy)
+                continue
+
             let add = false
 
             for (const tag of addon.tags) {
@@ -38,6 +49,11 @@ const findAddon = mods => {
         }
 
         addons.push(addon)
+    }
+
+    if (addons.length === 0) {
+        console.error("Found no addons")
+        process.exit(1)
     }
 
     return addons
@@ -59,26 +75,31 @@ const main = async () => {
 
     switch (process.argv[2]) {
         case "install":
-            console.log("Install")
-            break
-
-        case "search":
+        {
             if (process.argv.length <= 3) {
                 console.log("Missing mod name")
                 process.exit(1)
             }
 
-            const foundAddons = findAddon(mods)
+            for (const addon of findAddon(mods, false))
+                console.log(`Downloading: [${addon.publishedfileid}] ${removeNewlineEnd(addon.title)}`)
 
-            if (foundAddons.length === 0) {
-                console.error("Found no addons")
+            break
+        }
+
+        case "search":
+        {
+            if (process.argv.length <= 3) {
+                console.log("Missing mod name")
                 process.exit(1)
             }
 
-            for (const addon of foundAddons)
+
+            for (const addon of findAddon(mods, true))
                 console.log(`[${addon.publishedfileid}] ${removeNewlineEnd(addon.title)}`)
 
             break
+        }
 
         case "list": // TODO: Pages?
             for (const addon of mods.response.publishedfiledetails) {
