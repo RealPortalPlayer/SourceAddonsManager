@@ -5,6 +5,18 @@ const {basename} = require("path")
 
 const removeNewlineEnd = text => text.endsWith("\n") ? text.substring(0, text.length - 1) : text
 
+const findAddon = mods => {
+    let addonName = process.argv
+
+    addonName.shift()
+    addonName.shift()
+    addonName.shift()
+
+    addonName = addonName.join(" ")
+
+    return mods.response.publishedfiledetails.filter(addon => addon.result === 1 && addon.title.toLowerCase().includes(addonName.toLowerCase()))
+}
+
 const main = async () => {
     if (process.argv.length <= 2) {
         const executableName = basename(process.argv[1])
@@ -28,7 +40,21 @@ const main = async () => {
             break
 
         case "-S": case "--search":
-            console.log("Search")
+            if (process.argv.length <= 3) {
+                console.log("Missing mod name")
+                process.exit(1)
+            }
+
+            const foundAddons = findAddon(mods)
+
+            if (foundAddons.length === 0) {
+                console.error("Found no addons")
+                process.exit(1)
+            }
+
+            for (const addon of foundAddons)
+                console.log(`[${addon.publishedfileid}] ${removeNewlineEnd(addon.title)}`)
+
             break
 
         case "-L": case "--list": // TODO: Pages?
