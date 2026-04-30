@@ -7,6 +7,7 @@ const removeNewlineEnd = text => text.endsWith("\n") ? text.substring(0, text.le
 
 const findAddon = mods => {
     let addonName = process.argv
+    let addons = []
 
     addonName.shift()
     addonName.shift()
@@ -14,7 +15,32 @@ const findAddon = mods => {
 
     addonName = addonName.join(" ")
 
-    return mods.response.publishedfiledetails.filter(addon => addon.result === 1 && addon.title.toLowerCase().includes(addonName.toLowerCase()))
+    for (const addon of mods.response.publishedfiledetails) {
+        if (addon.result !== 1)
+            continue
+
+        if (!addon.title.toLowerCase().includes(addonName.toLowerCase())) {
+            let add = false
+
+            for (const tag of addon.tags) {
+                if (!tag.tag.toLowerCase().includes(addonName))
+                    continue
+
+                add = true
+                break
+            }
+
+            if (!add)
+                continue
+
+            addons.push(addon)
+            continue
+        }
+
+        addons.push(addon)
+    }
+
+    return addons
 }
 
 const main = async () => {
