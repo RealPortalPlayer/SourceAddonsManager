@@ -155,8 +155,21 @@ const main = async () => {
                     break
 
                 case "create":
-                    console.log("Collection create")
+                {
+                    if (process.argv.length <= 4) {
+                        console.log("Missing collection name")
+                        process.exit(1)
+                    }
+
+                    if (existsSync(`/home/kratcy/.config/sam/${process.argv[4]}.json`)) {
+                        console.error(`Collection already exists: ${process.argv[4]}`)
+                        process.exit(1)
+                    }
+
+                    console.log(`Creating collection: ${process.argv[4]}`)
+                    writeFileSync(`/home/kratcy/.config/sam/${process.argv[4]}.json`, "[]")
                     break
+                }
 
                 case "add":
                     console.log("Collection add")
