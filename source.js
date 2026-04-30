@@ -3,6 +3,8 @@
 
 const {basename} = require("path")
 
+const removeNewlineEnd = text => text.endsWith("\n") ? text.substring(0, text.length - 1) : text
+
 const main = async () => {
     if (process.argv.length <= 2) {
         const executableName = basename(process.argv[1])
@@ -29,8 +31,16 @@ const main = async () => {
             console.log("Search")
             break
 
-        case "-L": case "--list":
-            console.log("List")
+        case "-L": case "--list": // TODO: Pages?
+            for (const addon of mods.response.publishedfiledetails) {
+                if (addon.result !== 1)
+                    continue
+
+                console.log(`
+============================================ [${addon.publishedfileid}] Addon: ${removeNewlineEnd(addon.title)}
+${removeNewlineEnd(addon.description)}`)
+            }
+
             break
 
         default:
