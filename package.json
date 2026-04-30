@@ -1,0 +1,7 @@
+{
+  "name": "source-addons-manager",
+  "version": "1.0.0",
+  "description": "",
+  "main": "source.js",
+  "private": true
+}
