@@ -67,6 +67,17 @@ const findAddon = (mods, fuzzy) => {
     return addons
 }
 
+const listAll = (mods, includeDescriptions) => {
+    for (const addon of mods.response.publishedfiledetails) {
+        if (addon.result !== 1) {
+            addon.title = "<[KRATCY]: THIS ADDON IS UNAVAILABLE ON THE STEAM WORKSHOP>"
+            addon.description = "<[KRATCY]: THIS ADDON IS UNAVAILABLE ON THE STEAM WORKSHOP>"
+        }
+
+        console.log(`${includeDescriptions ? "\n============================================" : ""}[${addon.publishedfileid}] ${includeDescriptions ? "Addon: " : ""}${removeNewlineEnd(addon.title)}${includeDescriptions ? `\n${removeNewlineEnd(addon.description)}` : ""}`)
+    }
+}
+
 const main = async () => {
     if (process.argv.length <= 2) {
         const executableName = basename(process.argv[1])
@@ -74,7 +85,7 @@ const main = async () => {
         console.log(`${executableName} <operation> [...]`)
         console.log("   install <addon>")
         console.log("   search <addon>")
-        console.log("   list")
+        console.log("   list [--include_descriptions]")
         return
     }
 
@@ -111,17 +122,7 @@ const main = async () => {
         }
 
         case "list": // TODO: Pages?
-            for (const addon of mods.response.publishedfiledetails) {
-                if (addon.result !== 1) {
-                    addon.title = "<[KRATCY]: THIS ADDON IS UNAVAILABLE ON THE STEAM WORKSHOP>"
-                    addon.description = "<[KRATCY]: THIS ADDON IS UNAVAILABLE ON THE STEAM WORKSHOP>"
-                }
-
-                console.log(`
-============================================ [${addon.publishedfileid}] Addon: ${removeNewlineEnd(addon.title)}
-${removeNewlineEnd(addon.description)}`)
-            }
-
+            listAll(mods, process.argv[3] === "--include_descriptions")
             break
 
         default:
