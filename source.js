@@ -78,6 +78,19 @@ const listAll = (mods, includeDescriptions) => {
     }
 }
 
+const insall = async (mods, addon) => {
+    console.log(`Downloading: [${addon.publishedfileid}] ${removeNewlineEnd(addon.title)}`)
+
+    const vpk = await fetch(`http://10.0.44.20:5113/Mods/Left 4 Dead 2/${addon.publishedfileid}.vpk`)
+
+    if (!vpk.ok) {
+        console.log("Error while trying to download addon from server")
+        process.exit(1)
+    }
+
+    writeFileSync(`/home/kratcy/.steamapps/common/Left 4 Dead 2/left4dead2/addons/${addon.publishedfileid}.vpk`, await vpk.bytes())
+}
+
 const main = async () => {
     if (process.argv.length <= 2 || (process.argv[2] === "collection" && process.argv.length === 3)) {
         const executableName = basename(process.argv[1])
@@ -111,18 +124,7 @@ const main = async () => {
                 process.exit(1)
             }
 
-            const addon = addons[0]
-
-            console.log(`Downloading: [${addon.publishedfileid}] ${removeNewlineEnd(addon.title)}`)
-
-            const vpk = await fetch(`http://10.0.44.20:5113/Mods/Left 4 Dead 2/${addon.publishedfileid}.vpk`)
-
-            if (!vpk.ok) {
-                console.log("Error while trying to download addon from server")
-                process.exit(1)
-            }
-
-            writeFileSync(`/home/kratcy/.steamapps/common/Left 4 Dead 2/left4dead2/addons/${addon.publishedfileid}.vpk`, await vpk.bytes())
+            await insall(mods, addons[0])
             break
         }
 
@@ -190,8 +192,8 @@ const main = async () => {
 
                 case "add":
                 {
-                    if (process.argv.length <= 4) {
-                        console.log("Missing collection name")
+                    if (process.argv.length <= 5) {
+                        console.log("Missing either collection name or addon")
                         process.exit(1)
                     }
 
@@ -217,7 +219,28 @@ const main = async () => {
                 }
 
                 case "install":
-                    console.log("Collection install")
+                    if (process.argv.length <= 4) {
+                        console.log("Missing collection name")
+                        process.exit(1)
+                    }
+
+                    if (!existsSync(`/home/kratcy/.config/sam/${process.argv[4]}.json`)) {
+                        console.error(`Collection does not exists: ${process.argv[4]}`)
+                        process.exit(1)
+                    }
+
+                    const collection = require(`/home/kratcy/.config/sam/${process.argv[4]}.json`)
+
+                    for (const addon of collection) {
+                        const details = mods.response.publishedfiledetails.filter(found => found.publishedfileid === addon)
+
+                        if (details.length === 0 || details.length > 1) {
+                            console.log(`???????????????? ${details.length}`)
+                            continue
+                        }
+
+                        await insall(mods, details[0])
+                    }
                     break
 
                 default:
