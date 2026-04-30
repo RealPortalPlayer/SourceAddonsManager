@@ -13,13 +13,13 @@ const findAddon = mods => {
     addonName.shift()
     addonName.shift()
 
-    addonName = addonName.join(" ")
+    addonName = addonName.join(" ").toLowerCase()
 
     for (const addon of mods.response.publishedfiledetails) {
         if (addon.result !== 1)
             continue
 
-        if (!addon.title.toLowerCase().includes(addonName.toLowerCase())) {
+        if (!addon.title.toLowerCase().includes(addonName) && !addon.description.includes(addonName)) {
             let add = false
 
             for (const tag of addon.tags) {
