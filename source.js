@@ -120,16 +120,6 @@ const main = async () => {
             }
 
             writeFileSync(`/home/kratcy/.steamapps/common/Left 4 Dead 2/left4dead2/addons/${addon.publishedfileid}.vpk`, await vpk.bytes())
-
-            const jpg = await fetch(`http://10.0.44.20:5113/Mods/Left 4 Dead 2/${addon.publishedfileid}.jpg`)
-
-            if (!jpg.ok) {
-                console.log("Errored while trying to download addon image from server. Was the addon unavailable?")
-                console.log("Addon should still work, but it will not have a image inside the addons menu")
-                process.exit(0)
-            }
-
-            writeFileSync(`/home/kratcy/.steamapps/common/Left 4 Dead 2/left4dead2/addons/${addon.publishedfileid}.jpg`, await jpg.bytes())
             break
         }
 
