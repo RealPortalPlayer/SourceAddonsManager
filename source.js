@@ -27,7 +27,7 @@ const findAddon = (mods, fuzzy) => {
         if (addon.result !== 1) {
             addon.title = "<[KRATCY]: THIS ADDON IS UNAVAILABLE ON THE STEAM WORKSHOP>"
             addon.description = "<[KRATCY]: THIS ADDON IS UNAVAILABLE ON THE STEAM WORKSHOP>"
-            addon.tags = ["<[KRATCY]: THIS ADDON IS UNAVAILABLE ON THE STEAM WORKSHOP>"]
+            addon.tags = [{tag: "<[KRATCY]: THIS ADDON IS UNAVAILABLE ON THE STEAM WORKSHOP>"}]
         }
 
         if (!checkTitle(addon.title) && !checkDescription(addon.description)) {
