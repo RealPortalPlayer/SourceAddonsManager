@@ -2,7 +2,9 @@
 // Created on: 4/29/26 @ 11:10 PM
 
 const {basename} = require("path")
-const {writeFileSync, existsSync, mkdirSync, readdirSync} = require("fs")
+const {writeFileSync, existsSync, mkdirSync, readdirSync, unlinkSync, rmSync} = require("fs")
+
+// FIXME: This script is a mess. Perhaps rewrite portions of it?
 
 const removeNewlineEnd = text => text.endsWith("\n") ? text.substring(0, text.length - 1) : text
 
@@ -103,6 +105,7 @@ const main = async () => {
         console.log("   collection create <name>")
         console.log("   collection add <name> <id>")
         console.log("   collection install <name>")
+        console.log("   uninstall <name/--all>")
         return
     }
 
@@ -247,6 +250,40 @@ const main = async () => {
                     console.error(`Invalid collection option: ${process.argv[3]}`)
                     process.exit(1)
                     break
+            }
+
+            break
+        }
+
+        case "uninstall":
+        {
+            if (process.argv.length <= 3) {
+                console.log("Missing mod name")
+                process.exit(1)
+            }
+
+            if (process.argv[3] === "--all") {
+                console.log("Uninstalling all addons")
+                rmSync("/home/kratcy/.steamapps/common/Left 4 Dead 2/left4dead2/addons", {
+                    recursive: true
+                })
+                mkdirSync("/home/kratcy/.steamapps/common/Left 4 Dead 2/left4dead2/addons")
+                break
+            }
+
+            for (const file of readdirSync("/home/kratcy/.steamapps/common/Left 4 Dead 2/left4dead2/addons")) {
+                if (!file.endsWith(".vpk"))
+                    continue
+
+                const details = findAddon(mods, 3, true)
+
+                for (const addon of details) {
+                    if (file !== `${addon.publishedfileid}.vpk`)
+                        continue
+
+                    console.log(`Deleting: [${addon.publishedfileid}] ${removeNewlineEnd(addon.title)}`)
+                    unlinkSync(`/home/kratcy/.steamapps/common/Left 4 Dead 2/left4dead2/addons/${file}`)
+                }
             }
 
             break
