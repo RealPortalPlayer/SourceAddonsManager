@@ -24,10 +24,18 @@ const findAddon = (mods, fuzzy) => {
     }
 
     for (const addon of mods.response.publishedfiledetails) {
-        if (addon.result !== 1)
-            continue
+        if (addon.result !== 1) {
+            addon.title = "<[KRATCY]: THIS ADDON IS UNAVAILABLE ON THE STEAM WORKSHOP>"
+            addon.description = "<[KRATCY]: THIS ADDON IS UNAVAILABLE ON THE STEAM WORKSHOP>"
+            addon.tags = ["<[KRATCY]: THIS ADDON IS UNAVAILABLE ON THE STEAM WORKSHOP>"]
+        }
 
         if (!checkTitle(addon.title) && !checkDescription(addon.description)) {
+            if (addon.publishedfileid === addonName) {
+                addons.push(addon)
+                continue
+            }
+
             if (!fuzzy)
                 continue
 
@@ -81,8 +89,9 @@ const main = async () => {
                 process.exit(1)
             }
 
-            for (const addon of findAddon(mods, false))
+            for (const addon of findAddon(mods, false)) {
                 console.log(`Downloading: [${addon.publishedfileid}] ${removeNewlineEnd(addon.title)}`)
+            }
 
             break
         }
@@ -103,8 +112,10 @@ const main = async () => {
 
         case "list": // TODO: Pages?
             for (const addon of mods.response.publishedfiledetails) {
-                if (addon.result !== 1)
-                    continue
+                if (addon.result !== 1) {
+                    addon.title = "<[KRATCY]: THIS ADDON IS UNAVAILABLE ON THE STEAM WORKSHOP>"
+                    addon.description = "<[KRATCY]: THIS ADDON IS UNAVAILABLE ON THE STEAM WORKSHOP>"
+                }
 
                 console.log(`
 ============================================ [${addon.publishedfileid}] Addon: ${removeNewlineEnd(addon.title)}
