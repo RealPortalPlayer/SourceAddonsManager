@@ -2,7 +2,7 @@
 // Created on: 4/29/26 @ 11:10 PM
 
 const {basename} = require("path")
-const {writeFileSync} = require("fs")
+const {writeFileSync, existsSync, mkdirSync, readdirSync} = require("fs")
 
 const removeNewlineEnd = text => text.endsWith("\n") ? text.substring(0, text.length - 1) : text
 
@@ -80,13 +80,17 @@ const listAll = (mods, includeDescriptions) => {
 }
 
 const main = async () => {
-    if (process.argv.length <= 2) {
+    if (process.argv.length <= 2 || (process.argv[2] === "collection" && process.argv.length === 3)) {
         const executableName = basename(process.argv[1])
 
         console.log(`${executableName} <operation> [...]`)
         console.log("   install <addon>")
         console.log("   search <addon>")
         console.log("   list [--include_descriptions]")
+        console.log("   collection list")
+        console.log("   collection create <name>")
+        console.log("   collection add <name> <id>")
+        console.log("   collection install <name>")
         return
     }
 
@@ -139,6 +143,37 @@ const main = async () => {
         case "list": // TODO: Pages?
             listAll(mods, process.argv[3] === "--include_descriptions")
             break
+
+        case "collection":
+        {
+            if (!existsSync("/home/kratcy/.config/sam"))
+                mkdirSync("/home/kratcy/.config/sam")
+
+            switch (process.argv[3]) {
+                case "list":
+                    console.log("Collection list")
+                    break
+
+                case "create":
+                    console.log("Collection create")
+                    break
+
+                case "add":
+                    console.log("Collection add")
+                    break
+
+                case "install":
+                    console.log("Collection install")
+                    break
+
+                default:
+                    console.error(`Invalid collection option: ${process.argv[3]}`)
+                    process.exit(1)
+                    break
+            }
+
+            break
+        }
 
         default:
             console.error(`Invalid option: ${process.argv[2]}`)
