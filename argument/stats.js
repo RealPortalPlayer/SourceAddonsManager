@@ -6,5 +6,5 @@ const Addons = require("../internal/addons")
 
 module.exports = require("../internal/argument")("Show stats", [], () => {
     console.log(`Addons: ${Addons.getAll().length}`)
-    console.log(`Collections: ${Collections.getAll(true).length}/${Collections.getAll(false).length}`)
+    console.log(`Collections: ${Collections.getEnabled().length}/${Collections.getAll().length}`)
 })

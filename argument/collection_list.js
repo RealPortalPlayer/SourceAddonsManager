@@ -4,6 +4,6 @@
 const Collections = require("../internal/collections")
 
 module.exports = require("../internal/argument")("List collections", ["[--include-addons]"], () => {
-    for (const collection of Collections.getAll(false))
+    for (const collection of Collections.getAll())
         Collections.print(collection, process.argv[3] === "--include-addons")
 })

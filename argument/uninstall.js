@@ -15,7 +15,7 @@ module.exports = require("../internal/argument")("Uninstall addon", ["<addon/--a
         })
         mkdirSync(`${Paths.getSteamApplications()}/common/Left 4 Dead 2/left4dead2/addons`)
 
-        for (const collection of Collections.getAll(true))
+        for (const collection of Collections.getEnabled())
             await Collections.install(collection)
 
         return

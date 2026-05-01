@@ -6,26 +6,33 @@ const {existsSync, mkdirSync, writeFileSync} = require("fs")
 const Addons = require("./addons")
 const Paths = require("./paths")
 
-let externalCollections = null
-let internalCollections = null
+let collections = null
+let localCollections = null
 
 module.exports.initialize = async () => {
     if (!existsSync(Paths.getConfiguration()))
         mkdirSync(Paths.getConfiguration())
 
     if (!existsSync(Paths.getEnabledCollections()))
-        writeFileSync(Paths.getEnabledCollections(), "[]")
+        writeFileSync(Paths.getEnabledCollections(), JSON.stringify({
+            enabled: [],
+            local: []
+        }))
 
     // FIXME: This sucks, but there isn't really much we can do about it... Too bad.
-    externalCollections = await (await fetch("http://10.0.44.20:5113/Mods/Left 4 Dead 2/collections.json")).json()
-    internalCollections = require(Paths.getEnabledCollections())
+    collections = await (await fetch("http://10.0.44.20:5113/Mods/Left 4 Dead 2/collections.json")).json()
+    localCollections = require(Paths.getEnabledCollections())
+
+    for (const collection of localCollections.local) {
+        collections = collections.filter(found => found.title !== collection.title)
+
+        collections.push(collection)
+    }
 }
 
-module.exports.get = name => externalCollections.filter(found => found.name === name)[0]
+module.exports.get = name => collections.filter(found => found.name === name)[0]
 
-module.exports.install = async name => {
-    const collection = module.exports.get(name)
-
+module.exports.install = async collection => {
     if (collection == null) {
         console.log(`Collection not found: ${name}`)
         return
@@ -35,7 +42,16 @@ module.exports.install = async name => {
     await Addons.installList(collection.ids)
 }
 
-module.exports.getAll = local => local ? internalCollections : externalCollections
+module.exports.getAll = () => collections
+
+module.exports.getEnabled = () => {
+    let array = []
+
+    for (const collection of localCollections.enabled)
+        array.push(module.exports.get(collection))
+
+    return array
+}
 
 module.exports.print = (collection, includeAddons) => {
     console.log(`${collection.name}${includeAddons ? ":" : ""}`)
@@ -55,14 +71,14 @@ module.exports.toggle = name => {
         process.exit(1)
     }
 
-    if (!internalCollections.includes(name)) {
+    if (!localCollections.enabled.includes(name)) {
         console.log(`Enabling: ${name}`)
-        internalCollections.push(name)
+        localCollections.enabled.push(name)
     } else {
         console.log(`Disabling: ${name}`)
 
-        internalCollections = internalCollections.filter(collection => collection !== name)
+        localCollections.enabled = localCollections.enabled.filter(collection => collection !== name)
     }
 
-    writeFileSync(Paths.getEnabledCollections(), JSON.stringify(internalCollections))
+    writeFileSync(Paths.getEnabledCollections(), JSON.stringify(localCollections))
 }
