@@ -96,6 +96,9 @@ module.exports.print = (collection, includeAddons) => {
     Logger.debug(collection.name)
     Logger.log(`${localCollections.enabled.includes(collection.name) ? "* " : "  "}${collection.name}${includeAddons ? ":" : ""}`)
 
+    if (!includeAddons)
+        return
+
     for (const addon of collection.ids)
         Addons.print(Addons.find(addon, false)[0], false)
 }
