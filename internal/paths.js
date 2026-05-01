@@ -11,7 +11,7 @@ module.exports.getConfiguration = () => {
     }
 }
 
-module.exports.getEnabledCollections = () => {
+module.exports.getLocalCollections = () => {
     return `${module.exports.getConfiguration()}/collections.json`
 }
 

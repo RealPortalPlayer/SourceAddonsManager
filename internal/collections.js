@@ -5,6 +5,7 @@ const {existsSync, mkdirSync, writeFileSync} = require("fs")
 
 const Addons = require("./addons")
 const Paths = require("./paths")
+const {find} = require("./addons");
 
 let collections = null
 let localCollections = null
@@ -13,15 +14,15 @@ module.exports.initialize = async () => {
     if (!existsSync(Paths.getConfiguration()))
         mkdirSync(Paths.getConfiguration())
 
-    if (!existsSync(Paths.getEnabledCollections()))
-        writeFileSync(Paths.getEnabledCollections(), JSON.stringify({
+    if (!existsSync(Paths.getLocalCollections()))
+        writeFileSync(Paths.getLocalCollections(), JSON.stringify({
             enabled: [],
             local: []
         }))
 
     // FIXME: This sucks, but there isn't really much we can do about it... Too bad.
     collections = await (await fetch("http://10.0.44.20:5113/Mods/Left 4 Dead 2/collections.json")).json()
-    localCollections = require(Paths.getEnabledCollections())
+    localCollections = require(Paths.getLocalCollections())
 
     for (const collection of localCollections.local) {
         collections = collections.filter(found => found.title !== collection.title)
@@ -80,5 +81,39 @@ module.exports.toggle = name => {
         localCollections.enabled = localCollections.enabled.filter(collection => collection !== name)
     }
 
-    writeFileSync(Paths.getEnabledCollections(), JSON.stringify(localCollections))
+    writeFileSync(Paths.getLocalCollections(), JSON.stringify(localCollections))
+}
+
+module.exports.addLocal = (name, addon) => {
+    let collection = module.exports.get(name)
+
+    if (collection == null)
+        collection = {
+            name,
+            ids: []
+        }
+
+    const addons = Addons.find(addon, false)
+    let added = 0
+
+    for (const found of addons) {
+        if (collection.ids.includes(found.publishedfileid))
+            continue
+
+        added++
+
+        console.log(`Adding: ${name} <- [${found.publishedfileid}] ${found.title}`)
+
+        collection.ids.push(found.publishedfileid)
+    }
+
+    if (added === 0) {
+        console.log("Collection was left unmodified")
+        process.exit(1)
+    }
+
+    localCollections.local = localCollections.local.filter(found => found.name !== name)
+
+    localCollections.local.push(collection)
+    writeFileSync(Paths.getLocalCollections(), JSON.stringify(localCollections))
 }
