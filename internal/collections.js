@@ -72,7 +72,7 @@ module.exports.getEnabled = () => {
 }
 
 module.exports.print = (collection, includeAddons) => {
-    console.log(`${collection.name}${includeAddons ? ":" : ""}`)
+    console.log(`${localCollections.enabled.includes(collection.name) ? "* " : "  "}${collection.name}${includeAddons ? ":" : ""}`)
 
     if (!includeAddons)
         return
