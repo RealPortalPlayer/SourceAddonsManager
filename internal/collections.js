@@ -125,6 +125,11 @@ module.exports.toggle = name => {
 }
 
 module.exports.addLocal = (name, addon, override) => {
+    if (name === addon) {
+        Logger.log("You cannot add a collection to itself")
+        process.exit(7)
+    }
+
     let collection = localCollections.local.find(found => found.name === name)
 
     if (collection == null)
