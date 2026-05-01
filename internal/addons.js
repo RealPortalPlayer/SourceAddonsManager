@@ -211,3 +211,16 @@ module.exports.installList = async ids => {
         await module.exports.install(details[0])
     }
 }
+
+module.exports.downloadList = async ids => {
+    for (const id of ids) {
+        const details = module.exports.find(id, false)
+
+        if (details.length === 0 || details.length > 1) {
+            console.log(`???????????????? ${id}, ${details.length}`)
+            continue
+        }
+
+        await module.exports.download(details[0])
+    }
+}

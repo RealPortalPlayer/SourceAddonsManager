@@ -50,14 +50,32 @@ module.exports.initialize = async () => {
 
 module.exports.get = name => collections.filter(found => found.name === name)[0]
 
+const internalInstall = async (addonsFunction, collection) => {
+
+}
+
 module.exports.install = async collection => {
     if (collection == null) {
-        console.log(`Collection not found: ${name}`)
+        console.log(`Collection not found`)
         return
     }
 
-    console.log(`Installing collection: ${name}`)
+    console.log(`Installing collection: ${collection.name}`)
     await Addons.installList(collection.ids)
+}
+
+module.exports.download = async collection => {
+    if (collection == null) {
+        console.log(`Collection not found`)
+        return
+    }
+
+    if (!existsSync(`${process.cwd()}/${collection.name}`))
+        mkdirSync(`${process.cwd()}/${collection.name}`)
+
+    process.chdir(`${process.cwd()}/${collection.name}`)
+    console.log(`Downloading collection: ${collection.name}`)
+    await Addons.downloadList(collection.ids)
 }
 
 module.exports.getAll = () => collections
