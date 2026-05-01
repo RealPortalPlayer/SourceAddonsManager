@@ -131,10 +131,6 @@ module.exports.install = async addon => {
         execSync(`${magick} "${Paths.getSteamApplications()}/common/Left 4 Dead 2/left4dead2/addons/${addon.publishedfileid}.jpg" -strip -sampling-factor 4:2:0 "${Paths.getSteamApplications()}/common/Left 4 Dead 2/left4dead2/addons/${addon.publishedfileid}/addonimage.jpg"`)
     } catch {
         console.log("Failed to fix image")
-        rmSync(`${Paths.getSteamApplications()}/common/Left 4 Dead 2/left4dead2/addons/${addon.publishedfileid}`, {
-            recursive: true
-        })
-        return
     }
 
     if (!existsSync(`${Paths.getSteamApplications()}/common/Left 4 Dead 2/left4dead2/addons/${addon.publishedfileid}/addoninfo.txt`)) {
