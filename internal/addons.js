@@ -105,6 +105,9 @@ module.exports.install = async addon => {
         return
     }
 
+    if (!execSync(`${vpkedit} "${Paths.getSteamApplications()}/common/Left 4 Dead 2/left4dead2/addons/${addon.publishedfileid}.vpk" --file-tree`).toString().includes("addoninfo.txt"))
+        return // No need to try fixing the addon image if it isn't going to show up in the first place
+
     let magick = null
 
     try {
@@ -114,7 +117,6 @@ module.exports.install = async addon => {
         console.log("ImageMagick is not installed. Unable to fix addon images")
         return
     }
-
 
     try {
         execSync(`${vpkedit} "${Paths.getSteamApplications()}/common/Left 4 Dead 2/left4dead2/addons/${addon.publishedfileid}.vpk" -o "${Paths.getSteamApplications()}/common/Left 4 Dead 2/left4dead2/addons" --extract > /dev/null`)
