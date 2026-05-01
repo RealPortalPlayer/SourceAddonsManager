@@ -3,6 +3,6 @@
 
 const Collections = require("../internal/collections")
 
-module.exports = require("../internal/argument")("Add to a local collection", ["<name>", "<addon>"], () => {
-    Collections.addLocal(process.argv[3], process.argv[4])
+module.exports = require("../internal/argument")("Add to a local collection", ["<name>", "<addon>", "[--override]"], () => {
+    Collections.addLocal(process.argv[3], process.argv[4], process.argv[5] === "--override")
 })

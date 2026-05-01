@@ -32,6 +32,13 @@ module.exports.initialize = async () => {
             continue
         }
 
+        if (collection.override) {
+            collections = collections.filter(found => found.name !== collection.name)
+
+            collections.push(collection)
+            continue
+        }
+
         for (const id of collection.ids) {
             if (oldCollection.ids.includes(id))
                 continue
@@ -94,13 +101,14 @@ module.exports.toggle = name => {
     writeFileSync(Paths.getLocalCollections(), JSON.stringify(localCollections))
 }
 
-module.exports.addLocal = (name, addon) => {
+module.exports.addLocal = (name, addon, override) => {
     let collection = localCollections.local.find(found => found.name === name)
 
     if (collection == null)
         collection = {
             name,
-            ids: []
+            ids: [],
+            override: !!override
         }
 
     const addons = Addons.find(addon, false)
