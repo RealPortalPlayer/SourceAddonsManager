@@ -10,11 +10,11 @@ const Collections = require("./internal/collections")
 const main = async () => {
     const validArguments = {}
 
-    for (const argument of readdirSync("./argument")) {
+    for (const argument of readdirSync(`${__dirname}/argument`)) {
         if (!argument.endsWith(".js"))
             continue
 
-        validArguments[argument.substring(0, argument.length - 3)] = require(`./argument/${argument}`)
+        validArguments[argument.substring(0, argument.length - 3)] = require(`${__dirname}//argument/${argument}`)
     }
 
     if (process.argv.length <= 2) {
