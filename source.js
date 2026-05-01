@@ -18,9 +18,7 @@ const main = async () => {
     }
 
     if (process.argv.length <= 2) {
-        const executableName = basename(process.argv[1])
-
-        console.log(`${executableName} <operation> [...]`)
+        console.log(`${basename(process.argv[1])} <operation> [...]`)
 
         for (const argument in validArguments) {
             const value = validArguments[argument]

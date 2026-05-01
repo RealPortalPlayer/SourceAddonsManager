@@ -3,7 +3,7 @@
 
 const Collections = require("../internal/collections")
 
-module.exports = require("../internal/argument")("List collections", [], () => {
+module.exports = require("../internal/argument")("List collections", ["[--include-addons]"], () => {
     for (const collection of Collections.getAll(false))
-        Collections.print(collection)
+        Collections.print(collection, process.argv[3] === "--include-addons")
 })

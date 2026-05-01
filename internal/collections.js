@@ -15,7 +15,7 @@ module.exports.initialize = async () => {
     if (!existsSync("/home/kratcy/.config/sam/collections.json"))
         writeFileSync("/home/kratcy/.config/sam/collections.json", "[]")
 
-
+    // FIXME: This sucks, but there isn't really much we can do about it... Too bad.
     externalCollections = await (await fetch("http://10.0.44.20:5113/Mods/Left 4 Dead 2/collections.json")).json()
     internalCollections = require("/home/kratcy/.config/sam/collections.json")
 }
@@ -36,8 +36,11 @@ module.exports.install = async name => {
 
 module.exports.getAll = local => local ? internalCollections : externalCollections
 
-module.exports.print = collection => {
-    console.log(`${collection.name}:`)
+module.exports.print = (collection, includeAddons) => {
+    console.log(`${collection.name}${includeAddons ? ":" : ""}`)
+
+    if (!includeAddons)
+        return
 
     for (const addon of collection.ids)
         Addons.print(Addons.find(addon, false)[0], false)
