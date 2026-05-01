@@ -8,12 +8,13 @@ const Strings = require("./strings")
 const Paths = require("./paths")
 const Logger = require("./logger")
 const Collections = require("./collections")
+const fetchit = require("./fetchit")
 
 let mods = null
 
 module.exports.initialize = async () => {
     // FIXME: This sucks, but there isn't really much we can do about it... Too bad.
-    mods = await (await fetch("http://10.0.44.20:5113/Mods/Left 4 Dead 2/data.json")).json()
+    mods = await (await fetchit("http://10.0.44.20:5113/Mods/Left 4 Dead 2/data.json")).json()
 }
 
 module.exports.getAll = () => mods.response.publishedfiledetails
@@ -78,7 +79,7 @@ module.exports.find = (addonName, fuzzy) => {
 const internalInstall = async (path, subdirectory, addon) => {
     Logger.log(`Downloading: [${addon.publishedfileid}] ${Strings.removeNewlineEnd(addon.title)}`)
 
-    const vpk = await fetch(`http://10.0.44.20:5113/Mods/Left 4 Dead 2/${addon.publishedfileid}.vpk`)
+    const vpk = await fetchit(`http://10.0.44.20:5113/Mods/Left 4 Dead 2/${addon.publishedfileid}.vpk`)
 
     if (!vpk.ok) {
         Logger.log("Error while trying to download addon from server")
@@ -87,7 +88,7 @@ const internalInstall = async (path, subdirectory, addon) => {
 
     writeFileSync(`${path}/${addon.publishedfileid}.vpk`, await vpk.bytes())
 
-    const jpg = await fetch(`http://10.0.44.20:5113/Mods/Left 4 Dead 2/${addon.publishedfileid}.jpg`)
+    const jpg = await fetchit(`http://10.0.44.20:5113/Mods/Left 4 Dead 2/${addon.publishedfileid}.jpg`)
 
     if (!jpg.ok) {
         Logger.log("Error while trying to download image from server. Was this addon unavailable when added?")
