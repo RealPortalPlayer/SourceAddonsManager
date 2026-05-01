@@ -77,6 +77,11 @@ module.exports.find = (addonName, fuzzy) => {
 }
 
 const internalInstall = async (path, subdirectory, addon) => {
+    if (existsSync(`${path}/${subdirectory}`)) {
+        Logger.log(`Already downloaded addon: [${addon.publishedfileid}] ${addon.title}`)
+        return
+    }
+
     Logger.log(`Downloading: [${addon.publishedfileid}] ${Strings.removeNewlineEnd(addon.title)}`)
 
     const vpk = await fetchit(`http://10.0.44.20:5113/Mods/Left 4 Dead 2/${addon.publishedfileid}.vpk`)
