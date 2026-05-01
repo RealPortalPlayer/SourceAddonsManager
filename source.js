@@ -93,6 +93,8 @@ const insall = async (mods, addon) => {
     writeFileSync(`/home/kratcy/.steamapps/common/Left 4 Dead 2/left4dead2/addons/${addon.publishedfileid}.vpk`, await vpk.bytes())
 }
 
+const getCollections = async () => await (await fetch("http://10.0.44.20:5113/Mods/Left 4 Dead 2/collections.json")).json()
+
 const main = async () => {
     if (process.argv.length <= 2 || (process.argv[2] === "collection" && process.argv.length === 3)) {
         const executableName = basename(process.argv[1])
@@ -102,8 +104,6 @@ const main = async () => {
         console.log("   search <addon>")
         console.log("   list [--include_descriptions]")
         console.log("   collection list")
-        console.log("   collection create <name>")
-        console.log("   collection add <name> <id>")
         console.log("   collection install <name>")
         console.log("   uninstall <name/--all>")
         return
@@ -155,15 +155,10 @@ const main = async () => {
 
             switch (process.argv[3]) {
                 case "list":
-                    for (const collection of readdirSync("/home/kratcy/.config/sam")) {
-                        if (!collection.endsWith(".json"))
-                            continue
+                    for (const collection of await getCollections()) {
+                        console.log(`${collection.name}:`)
 
-                        const json = require(`/home/kratcy/.config/sam/${collection}`)
-
-                        console.log(`${collection.substring(0, collection.length - 5)}:`)
-
-                        for (const addon of json) {
+                        for (const addon of collection.ids) {
                             const details = mods.response.publishedfiledetails.filter(found => found.publishedfileid === addon)
 
                             if (details.length === 0 || details.length > 1) {
@@ -176,65 +171,27 @@ const main = async () => {
                     }
                     break
 
-                case "create":
-                {
-                    if (process.argv.length <= 4) {
-                        console.log("Missing collection name")
-                        process.exit(1)
-                    }
-
-                    if (existsSync(`/home/kratcy/.config/sam/${process.argv[4]}.json`)) {
-                        console.error(`Collection already exists: ${process.argv[4]}`)
-                        process.exit(1)
-                    }
-
-                    console.log(`Creating collection: ${process.argv[4]}`)
-                    writeFileSync(`/home/kratcy/.config/sam/${process.argv[4]}.json`, "[]")
-                    break
-                }
-
-                case "add":
-                {
-                    if (process.argv.length <= 5) {
-                        console.log("Missing either collection name or addon")
-                        process.exit(1)
-                    }
-
-                    if (!existsSync(`/home/kratcy/.config/sam/${process.argv[4]}.json`)) {
-                        console.error(`Collection does not exists: ${process.argv[4]}`)
-                        process.exit(1)
-                    }
-
-                    let collection = require(`/home/kratcy/.config/sam/${process.argv[4]}.json`)
-
-                    for (const addon of findAddon(mods, 5, true)) {
-                        if (collection.includes(addon.publishedfileid))
-                            continue
-
-                        console.log(`Adding to collection: ${process.argv[4]}, ${addon.publishedfileid}`)
-
-                        collection.push(addon.publishedfileid)
-                    }
-
-                    console.log("Writing new collection file")
-                    writeFileSync(`/home/kratcy/.config/sam/${process.argv[4]}.json`, JSON.stringify(collection))
-                    break
-                }
-
                 case "install":
                     if (process.argv.length <= 4) {
                         console.log("Missing collection name")
                         process.exit(1)
                     }
 
-                    if (!existsSync(`/home/kratcy/.config/sam/${process.argv[4]}.json`)) {
+                    process.argv.shift()
+                    process.argv.shift()
+                    process.argv.shift()
+                    process.argv.shift()
+
+                    const collectionName = process.argv.join(" ")
+
+                    const collection = (await getCollections()).filter(addon => addon.name === collectionName)
+
+                    if (collection.length === 0) {
                         console.error(`Collection does not exists: ${process.argv[4]}`)
                         process.exit(1)
                     }
 
-                    const collection = require(`/home/kratcy/.config/sam/${process.argv[4]}.json`)
-
-                    for (const addon of collection) {
+                    for (const addon of collection[0].ids) {
                         const details = mods.response.publishedfiledetails.filter(found => found.publishedfileid === addon)
 
                         if (details.length === 0 || details.length > 1) {
