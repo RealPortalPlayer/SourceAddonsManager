@@ -1,7 +1,8 @@
 // Purpose: Addon management
 // Created on: 5/1/26 @ 2:29 AM
 
-const {writeFileSync} = require("fs")
+const {writeFileSync, rmSync} = require("fs")
+const {execSync} = require("child_process")
 
 const Strings = require("./strings")
 const Paths = require("./paths")
@@ -89,10 +90,50 @@ module.exports.install = async addon => {
     if (!jpg.ok) {
         console.log("Error while trying to download image from server. Was this addon unavailable when added?")
         console.log("The addon should still work, but it might not have an image in the addons menu")
+        return
     }
 
-    // TODO: Fix the images and install them correctly
     writeFileSync(`${Paths.getSteamApplications()}/common/Left 4 Dead 2/left4dead2/addons/${addon.publishedfileid}.jpg`, await jpg.bytes())
+
+    let vpkedit = null
+
+    try {
+        vpkedit = execSync("command -v vpkeditcli").toString()
+        vpkedit = vpkedit.substring(0, vpkedit.length - 1)
+    } catch {
+        console.log("VPKEdit is not installed. Unable to fix addon images")
+        return
+    }
+
+    let magick = null
+
+    try {
+        magick = execSync("command -v magick").toString()
+        magick = magick.substring(0, magick.length - 1)
+    } catch {
+        console.log("ImageMagick is not installed. Unable to fix addon images")
+        return
+    }
+
+
+    try {
+        execSync(`${vpkedit} "${Paths.getSteamApplications()}/common/Left 4 Dead 2/left4dead2/addons/${addon.publishedfileid}.vpk" -o "${Paths.getSteamApplications()}/common/Left 4 Dead 2/left4dead2/addons" --extract > /dev/null`)
+    } catch {
+        console.log("Failed to extract addon")
+        return
+    }
+
+    try {
+        execSync(`${magick} "${Paths.getSteamApplications()}/common/Left 4 Dead 2/left4dead2/addons/${addon.publishedfileid}.jpg" -strip -sampling-factor 4:2:0 "${Paths.getSteamApplications()}/common/Left 4 Dead 2/left4dead2/addons/${addon.publishedfileid}/addonimage.jpg"`)
+    } catch {
+        console.log("Failed to fix image")
+        rmSync(`${Paths.getSteamApplications()}/common/Left 4 Dead 2/left4dead2/addons/${addon.publishedfileid}`, {
+            recursive: true
+        })
+    }
+
+    rmSync(`${Paths.getSteamApplications()}/common/Left 4 Dead 2/left4dead2/addons/${addon.publishedfileid}.vpk`)
+    rmSync(`${Paths.getSteamApplications()}/common/Left 4 Dead 2/left4dead2/addons/${addon.publishedfileid}.jpg`)
 }
 
 module.exports.print = (addon, includeDescriptions) => {
