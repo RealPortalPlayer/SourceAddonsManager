@@ -301,6 +301,34 @@ const main = async () => {
                     recursive: true
                 })
                 mkdirSync("/home/kratcy/.steamapps/common/Left 4 Dead 2/left4dead2/addons")
+
+                if (!existsSync("/home/kratcy/.config/sam/collections.json"))
+                    break
+
+                const collections = await getCollections()
+
+                console.log("Reinstalling collections")
+
+                for (const collectionName of require("/home/kratcy/.config/sam/collections.json")) {
+                    const collection = collections.filter(found => found.name === collectionName)
+
+                    if (collection.length === 0) {
+                        console.log(`???????????????? ${collectionName}`)
+                        continue
+                    }
+
+                    for (const addon of collection[0].ids) {
+                        const details = mods.response.publishedfiledetails.filter(found => found.publishedfileid === addon)
+
+                        if (details.length === 0 || details.length > 1) {
+                            console.log(`???????????????? ${details.length}`)
+                            continue
+                        }
+
+                        await insall(mods, details[0])
+                    }
+                }
+
                 break
             }
 
