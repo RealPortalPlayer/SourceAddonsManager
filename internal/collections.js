@@ -95,7 +95,7 @@ module.exports.toggle = name => {
 }
 
 module.exports.addLocal = (name, addon) => {
-    let collection = module.exports.get(name)
+    let collection = localCollections.local.find(found => found.name === name)
 
     if (collection == null)
         collection = {
