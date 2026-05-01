@@ -12,7 +12,7 @@ module.exports.initialize = async () => {
     mods = await (await fetch("http://10.0.44.20:5113/Mods/Left 4 Dead 2/data.json")).json()
 }
 
-module.exports.getAll = () => mods
+module.exports.getAll = () => mods.response.publishedfiledetails
 
 module.exports.find = (addonName, fuzzy) => {
     let addons = []
