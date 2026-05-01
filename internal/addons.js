@@ -6,7 +6,8 @@ const {execSync} = require("child_process")
 
 const Strings = require("./strings")
 const Paths = require("./paths")
-const Logger = require("./logger");
+const Logger = require("./logger")
+const Collections = require("./collections")
 
 let mods = null
 
@@ -117,7 +118,7 @@ const internalInstall = async (path, subdirectory, addon) => {
     }
 
     try {
-        execSync(`${vpkedit} "${path}/${addon.publishedfileid}.vpk" -o "${path}/${subdirectory}" --extract > /dev/null`)
+        execSync(`${vpkedit} "${path}/${addon.publishedfileid}.vpk" -o "${path}" --extract > /dev/null`)
     } catch {
         Logger.log("Failed to extract addon")
         return
@@ -205,8 +206,17 @@ module.exports.print = (addon, includeDescriptions) => {
     Logger.log(finalString)
 }
 
-module.exports.installList = async ids => {
+const internalInstallList = async (addonFunction, collectionFunction, ids) => {
     for (const id of ids) {
+        {
+            const collection = Collections.get(id)
+
+            if (collection != null) {
+                await (collectionFunction)(collection)
+                continue
+            }
+        }
+
         const details = module.exports.find(id, false)
 
         if (details.length === 0 || details.length > 1) {
@@ -214,19 +224,14 @@ module.exports.installList = async ids => {
             continue
         }
 
-        await module.exports.install(details[0])
+        await (addonFunction)(details[0])
     }
 }
 
+module.exports.installList = async ids => {
+    await internalInstallList(module.exports.install, Collections.install, ids)
+}
+
 module.exports.downloadList = async ids => {
-    for (const id of ids) {
-        const details = module.exports.find(id, false)
-
-        if (details.length === 0 || details.length > 1) {
-            Logger.log(`???????????????? ${id}, ${details.length}`)
-            continue
-        }
-
-        await module.exports.download(details[0])
-    }
+    await internalInstallList(module.exports.download, Collections.download, ids)
 }

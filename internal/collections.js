@@ -133,23 +133,36 @@ module.exports.addLocal = (name, addon, override) => {
             override: !!override
         }
 
-    const addons = Addons.find(addon, false)
-    let added = 0
+    const testCollection = module.exports.get(addon)
 
-    for (const found of addons) {
-        if (collection.ids.includes(found.publishedfileid))
-            continue
+    if (testCollection != null) {
+        if (collection.ids.includes(addon)) {
+            Logger.log("Collection was left unmodified")
+            process.exit(1)
+        }
 
-        added++
+        Logger.log(`Adding collection to collection: ${name} <- ${addon}`)
 
-        Logger.log(`Adding: ${name} <- [${found.publishedfileid}] ${found.title}`)
+        collection.ids.push(addon)
+    } else {
+        const addons = Addons.find(addon, false)
+        let added = 0
 
-        collection.ids.push(found.publishedfileid)
-    }
+        for (const found of addons) {
+            if (collection.ids.includes(found.publishedfileid))
+                continue
 
-    if (added === 0) {
-        Logger.log("Collection was left unmodified")
-        process.exit(1)
+            added++
+
+            Logger.log(`Adding: ${name} <- [${found.publishedfileid}] ${found.title}`)
+
+            collection.ids.push(found.publishedfileid)
+        }
+
+        if (added === 0) {
+            Logger.log("Collection was left unmodified")
+            process.exit(1)
+        }
     }
 
     localCollections.local = localCollections.local.filter(found => found.name !== name)
