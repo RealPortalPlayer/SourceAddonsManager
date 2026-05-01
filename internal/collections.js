@@ -25,9 +25,19 @@ module.exports.initialize = async () => {
     localCollections = require(Paths.getLocalCollections())
 
     for (const collection of localCollections.local) {
-        collections = collections.filter(found => found.name !== collection.name)
+        const oldCollection = module.exports.get(collection.name)
 
-        collections.push(collection)
+        if (oldCollection == null) {
+            collections.push(collection)
+            continue
+        }
+
+        for (const id of collection.ids) {
+            if (oldCollection.ids.includes(id))
+                continue
+
+            oldCollection.ids.push(id)
+        }
     }
 }
 
