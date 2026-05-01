@@ -105,6 +105,8 @@ const main = async () => {
         console.log("   list [--include_descriptions]")
         console.log("   collection list")
         console.log("   collection install <name>")
+        console.log("   collection enable <name>")
+        console.log("   collection disable <name>")
         console.log("   uninstall <name/--all>")
         return
     }
@@ -172,6 +174,7 @@ const main = async () => {
                     break
 
                 case "install":
+                {
                     if (process.argv.length <= 4) {
                         console.log("Missing collection name")
                         process.exit(1)
@@ -202,6 +205,79 @@ const main = async () => {
                         await insall(mods, details[0])
                     }
                     break
+                }
+
+                case "enable":
+                {
+                    if (process.argv.length <= 4) {
+                        console.log("Missing collection name")
+                        process.exit(1)
+                    }
+
+                    process.argv.shift()
+                    process.argv.shift()
+                    process.argv.shift()
+                    process.argv.shift()
+
+                    const collectionName = process.argv.join(" ")
+
+                    if ((await getCollections()).filter(addon => addon.name === collectionName).length === 0) {
+                        console.error(`Collection does not exists: ${process.argv[4]}`)
+                        process.exit(1)
+                    }
+
+                    if (!existsSync("/home/kratcy/.config/sam/collections.json"))
+                        writeFileSync("/home/kratcy/.config/sam/collections.json", "[]")
+
+                    const addedCollections = require("/home/kratcy/.config/sam/collections.json")
+
+                    if (addedCollections.includes(collectionName)) {
+                        console.log(`Already enabled: ${collectionName}`)
+                        process.exit(0)
+                    }
+
+                    console.log(`Enabling: ${collectionName}`)
+
+                    addedCollections.push(collectionName)
+                    writeFileSync("/home/kratcy/.config/sam/collections.json", JSON.stringify(addedCollections))
+                    break
+                }
+
+                case "disable":
+                {
+                    if (process.argv.length <= 4) {
+                        console.log("Missing collection name")
+                        process.exit(1)
+                    }
+
+                    process.argv.shift()
+                    process.argv.shift()
+                    process.argv.shift()
+                    process.argv.shift()
+
+                    const collectionName = process.argv.join(" ")
+
+                    if ((await getCollections()).filter(addon => addon.name === collectionName).length === 0) {
+                        console.error(`Collection does not exists: ${process.argv[4]}`)
+                        process.exit(1)
+                    }
+
+                    if (!existsSync("/home/kratcy/.config/sam/collections.json"))
+                        writeFileSync("/home/kratcy/.config/sam/collections.json", "[]")
+
+                    let addedCollections = require("/home/kratcy/.config/sam/collections.json")
+
+                    if (!addedCollections.includes(collectionName)) {
+                        console.log(`Already disabled: ${collectionName}`)
+                        process.exit(0)
+                    }
+
+                    console.log(`Disabling: ${collectionName}`)
+
+                    addedCollections = addedCollections.filter(collection => collection !== collectionName)
+                    writeFileSync("/home/kratcy/.config/sam/collections.json", JSON.stringify(addedCollections))
+                    break
+                }
 
                 default:
                     console.error(`Invalid collection option: ${process.argv[3]}`)
