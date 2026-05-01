@@ -142,7 +142,7 @@ module.exports.install = async addon => {
 \taddonversion\t\t"0.0"
 \taddontitle\t\t\t"${Strings.removeNewlineEnd(addon.title.replaceAll("\"", "")).substring(0, 127)}"
 \taddonauthor\t\t\t"${addon.creator.substring(0, 119)}"
-\taddonDescription\t"${addon.description.substring(0, 1023)}"
+\taddonDescription\t"${addon.description.substring(0, 1023).replaceAll("\"", "'")}"
 
 \taddonContent_Campaign\t\t${addon.tags.filter(tag => tag.tag === "Campaigns").length !== 0 ? "1" : "0"}
 \taddonContent_Map\t\t\t${addon.tags.filter(tag => tag.tag === "Campaigns").length !== 0 ? "1" : "0"}
