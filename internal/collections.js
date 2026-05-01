@@ -4,20 +4,21 @@
 const {existsSync, mkdirSync, writeFileSync} = require("fs")
 
 const Addons = require("./addons")
+const Paths = require("./paths")
 
 let externalCollections = null
 let internalCollections = null
 
 module.exports.initialize = async () => {
-    if (!existsSync("/home/kratcy/.config/sam"))
-        mkdirSync("/home/kratcy/.config/sam")
+    if (!existsSync(Paths.getConfiguration()))
+        mkdirSync(Paths.getConfiguration())
 
-    if (!existsSync("/home/kratcy/.config/sam/collections.json"))
-        writeFileSync("/home/kratcy/.config/sam/collections.json", "[]")
+    if (!existsSync(Paths.getEnabledCollections()))
+        writeFileSync(Paths.getEnabledCollections(), "[]")
 
     // FIXME: This sucks, but there isn't really much we can do about it... Too bad.
     externalCollections = await (await fetch("http://10.0.44.20:5113/Mods/Left 4 Dead 2/collections.json")).json()
-    internalCollections = require("/home/kratcy/.config/sam/collections.json")
+    internalCollections = require(Paths.getEnabledCollections())
 }
 
 module.exports.get = name => externalCollections.filter(found => found.name === name)[0]
@@ -63,5 +64,5 @@ module.exports.toggle = name => {
         internalCollections = internalCollections.filter(collection => collection !== name)
     }
 
-    writeFileSync("/home/kratcy/.config/sam/collections.json", JSON.stringify(internalCollections))
+    writeFileSync(Paths.getEnabledCollections(), JSON.stringify(internalCollections))
 }

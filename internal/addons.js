@@ -4,6 +4,7 @@
 const {writeFileSync} = require("fs")
 
 const Strings = require("./strings")
+const Paths = require("./paths")
 
 let mods = null
 
@@ -81,7 +82,7 @@ module.exports.install = async addon => {
         process.exit(1)
     }
 
-    writeFileSync(`/home/kratcy/.steamapps/common/Left 4 Dead 2/left4dead2/addons/${addon.publishedfileid}.vpk`, await vpk.bytes())
+    writeFileSync(`${Paths.getSteamApplications()}/common/Left 4 Dead 2/left4dead2/addons/${addon.publishedfileid}.vpk`, await vpk.bytes())
 
     const jpg = await fetch(`http://10.0.44.20:5113/Mods/Left 4 Dead 2/${addon.publishedfileid}.jpg`)
 
@@ -91,7 +92,7 @@ module.exports.install = async addon => {
     }
 
     // TODO: Fix the images and install them correctly
-    writeFileSync(`/home/kratcy/.steamapps/common/Left 4 Dead 2/left4dead2/addons/${addon.publishedfileid}.jpg`, await jpg.bytes())
+    writeFileSync(`${Paths.getSteamApplications()}/common/Left 4 Dead 2/left4dead2/addons/${addon.publishedfileid}.jpg`, await jpg.bytes())
 }
 
 module.exports.print = (addon, includeDescriptions) => {
