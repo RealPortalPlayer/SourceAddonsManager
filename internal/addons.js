@@ -207,12 +207,20 @@ module.exports.print = (addon, includeDescriptions) => {
     Logger.log(finalString)
 }
 
+let ignorelist = []
+
 const internalInstallList = async (addonFunction, collectionFunction, ids) => {
     for (const id of ids) {
         {
             const collection = Collections.get(id)
 
             if (collection != null) {
+                if (ignorelist.includes(id)) {
+                    Logger.log(`Recursion prevented. Collection already installed earlier: ${id}`)
+                    continue
+                }
+
+                ignorelist.push(id)
                 await (collectionFunction)(collection)
                 continue
             }
