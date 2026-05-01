@@ -6,6 +6,7 @@ const {execSync} = require("child_process")
 
 const Strings = require("./strings")
 const Paths = require("./paths")
+const Logger = require("./logger");
 
 let mods = null
 
@@ -66,21 +67,21 @@ module.exports.find = (addonName, fuzzy) => {
     }
 
     if (addons.length === 0) {
-        console.error("Found no addons")
-        process.exit(1)
+        Logger.log("Found no addons")
+        process.exit(4)
     }
 
     return addons
 }
 
 const internalInstall = async (path, subdirectory, addon) => {
-    console.log(`Downloading: [${addon.publishedfileid}] ${Strings.removeNewlineEnd(addon.title)}`)
+    Logger.log(`Downloading: [${addon.publishedfileid}] ${Strings.removeNewlineEnd(addon.title)}`)
 
     const vpk = await fetch(`http://10.0.44.20:5113/Mods/Left 4 Dead 2/${addon.publishedfileid}.vpk`)
 
     if (!vpk.ok) {
-        console.log("Error while trying to download addon from server")
-        process.exit(1)
+        Logger.log("Error while trying to download addon from server")
+        process.exit(5)
     }
 
     writeFileSync(`${path}/${addon.publishedfileid}.vpk`, await vpk.bytes())
@@ -88,8 +89,8 @@ const internalInstall = async (path, subdirectory, addon) => {
     const jpg = await fetch(`http://10.0.44.20:5113/Mods/Left 4 Dead 2/${addon.publishedfileid}.jpg`)
 
     if (!jpg.ok) {
-        console.log("Error while trying to download image from server. Was this addon unavailable when added?")
-        console.log("The addon should still work, but it might not have an image in the addons menu")
+        Logger.log("Error while trying to download image from server. Was this addon unavailable when added?")
+        Logger.log("The addon should still work, but it might not have an image in the addons menu")
         return
     }
 
@@ -101,7 +102,7 @@ const internalInstall = async (path, subdirectory, addon) => {
         vpkedit = execSync("command -v vpkeditcli").toString()
         vpkedit = vpkedit.substring(0, vpkedit.length - 1)
     } catch {
-        console.log("VPKEdit is not installed. Unable to fix addon images")
+        Logger.log("VPKEdit is not installed. Unable to fix addon images")
         return
     }
 
@@ -111,26 +112,26 @@ const internalInstall = async (path, subdirectory, addon) => {
         magick = execSync("command -v magick").toString()
         magick = magick.substring(0, magick.length - 1)
     } catch {
-        console.log("ImageMagick is not installed. Unable to fix addon images")
+        Logger.log("ImageMagick is not installed. Unable to fix addon images")
         return
     }
 
     try {
         execSync(`${vpkedit} "${path}/${addon.publishedfileid}.vpk" -o "${path}/${subdirectory}" --extract > /dev/null`)
     } catch {
-        console.log("Failed to extract addon")
+        Logger.log("Failed to extract addon")
         return
     }
 
     if (!existsSync(`${path}/${subdirectory}`)) {
-        console.log("Addon folder doesn't exist? Was the addon downloaded correctly?")
+        Logger.log("Addon folder doesn't exist? Was the addon downloaded correctly?")
         return
     }
 
     try {
         execSync(`${magick} "${path}/${addon.publishedfileid}.jpg" -strip -sampling-factor 4:2:0 "${path}/${subdirectory}/addonimage.jpg"`)
     } catch {
-        console.log("Failed to fix image")
+        Logger.log("Failed to fix image")
     }
 
     if (!existsSync(`${path}/${subdirectory}/addoninfo.txt`)) {
@@ -176,6 +177,11 @@ module.exports.download = async addon => {
 }
 
 module.exports.print = (addon, includeDescriptions) => {
+    if (process.env.SAM_PARSABLE === "1") {
+        Logger.debug(addon.publishedfileid)
+        return
+    }
+
     if (addon.result !== 1) {
         addon.title = "<[KRATCY]: THIS ADDON IS UNAVAILABLE ON THE STEAM WORKSHOP>"
         addon.description = "<[KRATCY]: THIS ADDON IS UNAVAILABLE ON THE STEAM WORKSHOP>"
@@ -196,7 +202,7 @@ module.exports.print = (addon, includeDescriptions) => {
     if (includeDescriptions)
         finalString += `\n${Strings.removeNewlineEnd(addon.description)}`
 
-    console.log(finalString)
+    Logger.log(finalString)
 }
 
 module.exports.installList = async ids => {
@@ -204,7 +210,7 @@ module.exports.installList = async ids => {
         const details = module.exports.find(id, false)
 
         if (details.length === 0 || details.length > 1) {
-            console.log(`???????????????? ${id}, ${details.length}`)
+            Logger.log(`???????????????? ${id}, ${details.length}`)
             continue
         }
 
@@ -217,7 +223,7 @@ module.exports.downloadList = async ids => {
         const details = module.exports.find(id, false)
 
         if (details.length === 0 || details.length > 1) {
-            console.log(`???????????????? ${id}, ${details.length}`)
+            Logger.log(`???????????????? ${id}, ${details.length}`)
             continue
         }
 

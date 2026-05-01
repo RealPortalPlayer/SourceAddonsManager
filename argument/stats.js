@@ -3,8 +3,11 @@
 
 const Collections = require("../internal/collections")
 const Addons = require("../internal/addons")
+const Logger =  require("../internal/logger")
 
 module.exports = require("../internal/argument")("Show stats", [], () => {
-    console.log(`Addons: ${Addons.getAll().length}`)
-    console.log(`Collections: ${Collections.getEnabled().length}/${Collections.getAll().length}`)
+    Logger.debug(Addons.getAll().length)
+    Logger.debug(Collections.getAll().length)
+    Logger.log(`Addons: ${Addons.getAll().length}`)
+    Logger.log(`Collections: ${Collections.getEnabled().length}/${Collections.getAll().length}`)
 })

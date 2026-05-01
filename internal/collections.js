@@ -6,6 +6,7 @@ const {existsSync, mkdirSync, writeFileSync} = require("fs")
 const Addons = require("./addons")
 const Paths = require("./paths")
 const {find} = require("./addons");
+const Logger = require("./logger");
 
 let collections = null
 let localCollections = null
@@ -50,23 +51,19 @@ module.exports.initialize = async () => {
 
 module.exports.get = name => collections.filter(found => found.name === name)[0]
 
-const internalInstall = async (addonsFunction, collection) => {
-
-}
-
 module.exports.install = async collection => {
     if (collection == null) {
-        console.log(`Collection not found`)
+        Logger.log(`Collection not found`)
         return
     }
 
-    console.log(`Installing collection: ${collection.name}`)
+    Logger.log(`Installing collection: ${collection.name}`)
     await Addons.installList(collection.ids)
 }
 
 module.exports.download = async collection => {
     if (collection == null) {
-        console.log(`Collection not found`)
+        Logger.log(`Collection not found`)
         return
     }
 
@@ -74,7 +71,7 @@ module.exports.download = async collection => {
         mkdirSync(`${process.cwd()}/${collection.name}`)
 
     process.chdir(`${process.cwd()}/${collection.name}`)
-    console.log(`Downloading collection: ${collection.name}`)
+    Logger.log(`Downloading collection: ${collection.name}`)
     await Addons.downloadList(collection.ids)
 }
 
@@ -90,10 +87,8 @@ module.exports.getEnabled = () => {
 }
 
 module.exports.print = (collection, includeAddons) => {
-    console.log(`${localCollections.enabled.includes(collection.name) ? "* " : "  "}${collection.name}${includeAddons ? ":" : ""}`)
-
-    if (!includeAddons)
-        return
+    Logger.debug(collection.name)
+    Logger.log(`${localCollections.enabled.includes(collection.name) ? "* " : "  "}${collection.name}${includeAddons ? ":" : ""}`)
 
     for (const addon of collection.ids)
         Addons.print(Addons.find(addon, false)[0], false)
@@ -103,15 +98,15 @@ module.exports.toggle = name => {
     const collection = module.exports.get(name)
 
     if (collection == null) {
-        console.log(`Collection not found: ${name}`)
-        process.exit(1)
+        Logger.log(`Collection not found: ${name}`)
+        process.exit(4)
     }
 
     if (!localCollections.enabled.includes(name)) {
-        console.log(`Enabling: ${name}`)
+        Logger.log(`Enabling: ${name}`)
         localCollections.enabled.push(name)
     } else {
-        console.log(`Disabling: ${name}`)
+        Logger.log(`Disabling: ${name}`)
 
         localCollections.enabled = localCollections.enabled.filter(collection => collection !== name)
     }
@@ -138,13 +133,13 @@ module.exports.addLocal = (name, addon, override) => {
 
         added++
 
-        console.log(`Adding: ${name} <- [${found.publishedfileid}] ${found.title}`)
+        Logger.log(`Adding: ${name} <- [${found.publishedfileid}] ${found.title}`)
 
         collection.ids.push(found.publishedfileid)
     }
 
     if (added === 0) {
-        console.log("Collection was left unmodified")
+        Logger.log("Collection was left unmodified")
         process.exit(1)
     }
 

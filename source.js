@@ -6,6 +6,7 @@ const {readdirSync} = require("fs")
 
 const Addons = require("./internal/addons")
 const Collections = require("./internal/collections")
+const Logger = require("./internal/logger")
 
 const main = async () => {
     const validArguments = {}
@@ -18,32 +19,32 @@ const main = async () => {
     }
 
     if (process.argv.length <= 2) {
-        console.log(`${basename(process.argv[1])} <operation> [...]`)
+        Logger.log(`${basename(process.argv[1])} <operation> [...]`)
 
         for (const argument in validArguments) {
             const value = validArguments[argument]
 
             if (value.length === 0) {
-                console.log(`   ${argument}: ${value.description}`)
+                Logger.log(`   ${argument}: ${value.description}`)
                 continue
             }
 
-            console.log(`   ${argument} ${value.arguments.join(" ")}: ${value.description}`)
+            Logger.log(`   ${argument} ${value.arguments.join(" ")}: ${value.description}`)
         }
 
-        return
+        process.exit(6)
     }
 
     const argument = validArguments[process.argv[2]]
 
     if (argument == null) {
-        console.error(`Invalid option: ${process.argv[2]}`)
+        Logger.error(`Invalid option: ${process.argv[2]}`)
         process.exit(1)
     }
 
     if (argument.arguments.filter(found => found.startsWith("<")).length > process.argv.length - 3) {
-        console.log("Not enough arguments")
-        process.exit(1)
+        Logger.log("Not enough arguments")
+        process.exit(2)
     }
 
     await Addons.initialize()

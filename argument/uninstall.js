@@ -6,10 +6,11 @@ const {rmSync, mkdirSync, readdirSync, unlinkSync} = require("fs")
 const Addons = require("../internal/addons")
 const Collections = require("../internal/collections")
 const Paths = require("../internal/paths")
+const Logger = require("../internal/logger")
 
 module.exports = require("../internal/argument")("Uninstall addon", ["<addon/--all>"], async () => {
     if (process.argv[3] === "--all") {
-        console.log("Uninstalling all addons")
+        Logger.log("Uninstalling all addons")
         rmSync(`${Paths.getSteamApplications()}/common/Left 4 Dead 2/left4dead2/addons`, {
             recursive: true
         })
@@ -31,7 +32,8 @@ module.exports = require("../internal/argument")("Uninstall addon", ["<addon/--a
             if (file !== `${addon.publishedfileid}.vpk`)
                 continue
 
-            console.log(`Deleting: [${addon.publishedfileid}] ${removeNewlineEnd(addon.title)}`)
+            Logger.log(`Deleting: [${addon.publishedfileid}] ${removeNewlineEnd(addon.title)}`)
+            Logger.debug(addon.publishedfileid)
             unlinkSync(`${Paths.getSteamApplications()}/common/Left 4 Dead 2/left4dead2/addons/${file}`)
         }
     }
