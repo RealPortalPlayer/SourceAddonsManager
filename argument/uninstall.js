@@ -7,6 +7,7 @@ const Addons = require("../internal/addons")
 const Collections = require("../internal/collections")
 const Paths = require("../internal/paths")
 const Logger = require("../internal/logger")
+const Strings = require("../internal/strings")
 
 module.exports = require("../internal/argument")("Uninstall addon", ["<addon/--all>"], async () => {
     if (process.argv[3] === "--all") {
@@ -34,7 +35,7 @@ module.exports = require("../internal/argument")("Uninstall addon", ["<addon/--a
                 continue
 
             if (!logged.includes(addon.publishedfileid)) {
-                Logger.log(`Deleting: [${addon.publishedfileid}] ${removeNewlineEnd(addon.title)}`)
+                Logger.log(`Deleting: [${addon.publishedfileid}] ${Strings.removeNewlineEnd(addon.title)}`)
                 Logger.debug(addon.publishedfileid)
                 logged.push(addon.publishedfileid)
             }
