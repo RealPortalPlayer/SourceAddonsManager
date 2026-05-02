@@ -78,7 +78,7 @@ module.exports.find = (addonName, fuzzy) => {
 
 const internalInstall = async (path, subdirectory, addon) => {
     if (existsSync(`${path}/${subdirectory}`)) {
-        Logger.log(`Already downloaded addon: [${addon.publishedfileid}] ${addon.title}`)
+        Logger.log(`Already downloaded addon: [${addon.publishedfileid}] ${Strings.removeNewlineEnd(addon.title)}`)
         return
     }
 
