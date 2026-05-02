@@ -76,11 +76,14 @@ module.exports.find = (addonName, fuzzy) => {
     return addons
 }
 
-const internalInstall = async (path, subdirectory, addon) => {
+const internalInstall = async (makeDirectory, path, subdirectory, addon) => {
     if (existsSync(`${path}/${subdirectory}`)) {
         Logger.log(`Already downloaded addon: [${addon.publishedfileid}] ${Strings.removeNewlineEnd(addon.title)}`)
         return
     }
+
+    if (makeDirectory)
+        mkdirSync(`${process.cwd()}/${subdirectory}`)
 
     Logger.log(`Downloading: [${addon.publishedfileid}] ${Strings.removeNewlineEnd(addon.title)}`)
 
@@ -171,16 +174,11 @@ const internalInstall = async (path, subdirectory, addon) => {
 }
 
 module.exports.install = async addon => {
-    await internalInstall(`${Paths.getSteamApplications()}/common/Left 4 Dead 2/left4dead2/addons`, addon.publishedfileid, addon)
+    await internalInstall(false, `${Paths.getSteamApplications()}/common/Left 4 Dead 2/left4dead2/addons`, addon.publishedfileid, addon)
 }
 
 module.exports.download = async addon => {
-    const subdirectory = `${addon.title} ${addon.publishedfileid}`
-
-    if (!existsSync(`${process.cwd()}/${subdirectory}`))
-        mkdirSync(`${process.cwd()}/${subdirectory}`)
-
-    await internalInstall(process.cwd(), subdirectory, addon)
+    await internalInstall(true, process.cwd(), `${addon.title} ${addon.publishedfileid}`, addon)
 }
 
 module.exports.print = (addon, includeDescriptions) => {
