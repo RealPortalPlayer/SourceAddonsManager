@@ -27,13 +27,18 @@ module.exports = require("../internal/argument")("Uninstall addon", ["<addon/--a
             continue
 
         const details = Addons.find(process.argv[3], true)
+        let logged = []
 
         for (const addon of details) {
-            if (file !== `${addon.publishedfileid}.vpk`)
+            if (file !== addon.publishedfileid && file !== `${addon.publishedfileid}.jpg` && file !== `${addon.publishedfileid}.vpk`)
                 continue
 
-            Logger.log(`Deleting: [${addon.publishedfileid}] ${removeNewlineEnd(addon.title)}`)
-            Logger.debug(addon.publishedfileid)
+            if (!logged.includes(addon.publishedfileid)) {
+                Logger.log(`Deleting: [${addon.publishedfileid}] ${removeNewlineEnd(addon.title)}`)
+                Logger.debug(addon.publishedfileid)
+                logged.push(addon.publishedfileid)
+            }
+
             unlinkSync(`${Paths.getSteamApplications()}/common/Left 4 Dead 2/left4dead2/addons/${file}`)
         }
     }
