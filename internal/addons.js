@@ -145,6 +145,7 @@ const internalInstall = async (path, addon) => {
 
     if (!existsSync(`${path}/${addon.publishedfileid}/addoninfo.txt`)) {
         // TODO: Some flags are never set
+        // TODO: This is very L4D2 specific
         writeFileSync(`${path}/${addon.publishedfileid}/addoninfo.txt`,
             `"AddonInfo"
 {
@@ -177,7 +178,7 @@ module.exports.install = async addon => {
 }
 
 module.exports.download = async addon => {
-    const subdirectory = `${process.cwd()}/${addon.title} ${addon.publishedfileid}`
+    const subdirectory = `${process.cwd()}/${addon.title.replaceAll("/", "_")} ${addon.publishedfileid}`
 
     if (existsSync(subdirectory)) {
         Logger.log(`Already downloaded addon: [${addon.publishedfileid}] ${Strings.removeNewlineEnd(addon.title)}`)
