@@ -3,8 +3,18 @@
 
 const Addons = require("../internal/addons")
 const Logger = require("../internal/logger")
+const Collections = require("../internal/collections")
 
 module.exports = require("../internal/argument")("Download an addon in the current folder", ["<addon>"], async () => {
+    {
+        const collection = Collections.get(process.argv[4])
+
+        if (collection != null) {
+            await Collections.download(collection)
+            return
+        }
+    }
+
     const addons = Addons.find(process.argv[4], false)
 
     if (addons.length > 1) {

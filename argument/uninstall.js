@@ -1,7 +1,7 @@
 // Purpose: Uninstall addons
 // Created on: 5/1/26 @ 2:59 AM
 
-const {rmSync, mkdirSync, readdirSync, unlinkSync} = require("fs")
+const {rmSync, mkdirSync, readdirSync, unlinkSync, existsSync} = require("fs")
 
 const Addons = require("../internal/addons")
 const Collections = require("../internal/collections")
@@ -22,6 +22,45 @@ module.exports = require("../internal/argument")("Uninstall addon", ["<addon/--a
             await Collections.install(collection)
 
         return
+    }
+
+    {
+        const collection = Collections.get(process.argv[4])
+
+        if (collection != null) {
+            const deletePathIfExists = (path, recursive) => {
+                if (!existsSync(path))
+                    return
+
+                rmSync(path, {
+                    recursive
+                })
+            }
+
+            const uninstall = selected => {
+                for (const addon of selected.ids) {
+                    {
+                        const foundCollection = Collections.get(addon)
+
+                        if (foundCollection != null) {
+                            uninstall(foundCollection)
+                            return
+                        }
+                    }
+
+                    const loggingAddon = Addons.find(addon, false)[0]
+
+                    Logger.log(`Deleting: [${loggingAddon.publishedfileid}] ${Strings.removeNewlineEnd(loggingAddon.title)}`)
+                    Logger.debug(loggingAddon.publishedfileid)
+                    deletePathIfExists(`${Paths.getSteamApplications()}/common/${Game.getName()}/${Game.getSubdirectory()}/addons/${addon}`, true)
+                    deletePathIfExists(`${Paths.getSteamApplications()}/common/${Game.getName()}/${Game.getSubdirectory()}/addons/${addon}.${Game.getAddonExtension()}`, false)
+                    deletePathIfExists(`${Paths.getSteamApplications()}/common/${Game.getName()}/${Game.getSubdirectory()}/addons/${addon}.jpg`, false)
+                }
+            }
+
+            uninstall(collection)
+            return
+        }
     }
 
     for (const file of readdirSync(`${Paths.getSteamApplications()}/common/${Game.getName()}/${Game.getSubdirectory()}/addons`)) {
