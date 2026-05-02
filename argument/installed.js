@@ -5,17 +5,18 @@ const {readdirSync, statSync} = require("fs")
 
 const Paths = require("../internal/paths")
 const Addons = require("../internal/addons")
+const Game = require("../internal/game")
 
 module.exports = require("../internal/argument")("Tell what addons you got installed", [], () => {
-    const addons = readdirSync(`${Paths.getSteamApplications()}/common/Left 4 Dead 2/left4dead2/addons`)
+    const addons = readdirSync(`${Paths.getSteamApplications()}/common/${Game.getName()}/${Game.getSubdirectory()}/addons`)
 
     for (const addon of addons) {
         let id = ""
 
-        if (statSync(`${Paths.getSteamApplications()}/common/Left 4 Dead 2/left4dead2/addons/${addon}`).isDirectory())
+        if (statSync(`${Paths.getSteamApplications()}/common/${Game.getName()}/${Game.getSubdirectory()}/addons/${addon}`).isDirectory())
             id = addon
         else {
-            if (addon.endsWith(".jpg") || !addon.endsWith(".vpk"))
+            if (addon.endsWith(".jpg") || !addon.endsWith(`.${Game.getAddonExtension()}`))
                 continue
 
             id = addon.substring(0, id.length - 4)

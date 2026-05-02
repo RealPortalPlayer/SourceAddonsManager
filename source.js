@@ -7,6 +7,7 @@ const {readdirSync} = require("fs")
 const Addons = require("./internal/addons")
 const Collections = require("./internal/collections")
 const Logger = require("./internal/logger")
+const Game = require("./internal/game")
 
 const main = async () => {
     const validArguments = {}
@@ -47,6 +48,7 @@ const main = async () => {
         process.exit(2)
     }
 
+    Game.initialize()
     await Addons.initialize()
     await Collections.initialize()
     await argument.action()

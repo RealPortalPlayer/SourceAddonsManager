@@ -9,12 +9,13 @@ const Paths = require("./paths")
 const Logger = require("./logger")
 const Collections = require("./collections")
 const fetchit = require("./fetchit")
+const Game = require("./game")
 
 let mods = null
 
 module.exports.initialize = async () => {
     // FIXME: This sucks, but there isn't really much we can do about it... Too bad.
-    mods = await (await fetchit("http://10.0.44.20:5113/Mods/Left 4 Dead 2/data.json")).json()
+    mods = await (await fetchit(`http://10.0.44.20:5113/Mods/${Game.getName()}/data.json`)).json()
 }
 
 module.exports.getAll = () => mods.response.publishedfiledetails
@@ -84,16 +85,16 @@ const internalInstall = async (path, addon) => {
 
     Logger.log(`Downloading: [${addon.publishedfileid}] ${Strings.removeNewlineEnd(addon.title)}`)
 
-    const vpk = await fetchit(`http://10.0.44.20:5113/Mods/Left 4 Dead 2/${addon.publishedfileid}.vpk`)
+    const vpk = await fetchit(`http://10.0.44.20:5113/Mods/${Game.getName()}/${addon.publishedfileid}.${Game.getAddonExtension()}`)
 
     if (!vpk.ok) {
         Logger.log("Error while trying to download addon from server")
         process.exit(5)
     }
 
-    writeFileSync(`${path}/${addon.publishedfileid}.vpk`, await vpk.bytes())
+    writeFileSync(`${path}/${addon.publishedfileid}.${Game.getAddonExtension()}`, await vpk.bytes())
 
-    const jpg = await fetchit(`http://10.0.44.20:5113/Mods/Left 4 Dead 2/${addon.publishedfileid}.jpg`)
+    const jpg = await fetchit(`http://10.0.44.20:5113/Mods/${Game.getName()}/${addon.publishedfileid}.jpg`)
 
     if (!jpg.ok) {
         Logger.log("Error while trying to download image from server. Was this addon unavailable when added?")
@@ -103,6 +104,7 @@ const internalInstall = async (path, addon) => {
 
     writeFileSync(`${path}/${addon.publishedfileid}.jpg`, await jpg.bytes())
 
+    // TODO: Not all games uses VPK
     let vpkedit = null
 
     try {
@@ -124,7 +126,7 @@ const internalInstall = async (path, addon) => {
     }
 
     try {
-        execSync(`${vpkedit} "${path}/${addon.publishedfileid}.vpk" -o "${path}" --extract > /dev/null`)
+        execSync(`${vpkedit} "${path}/${addon.publishedfileid}.${Game.getAddonExtension()}" -o "${path}" --extract > /dev/null`)
     } catch {
         Logger.log("Failed to extract addon")
         return
@@ -166,12 +168,12 @@ const internalInstall = async (path, addon) => {
 }`)
     }
 
-    rmSync(`${path}/${addon.publishedfileid}.vpk`)
+    rmSync(`${path}/${addon.publishedfileid}.${Game.getAddonExtension()}`)
     rmSync(`${path}/${addon.publishedfileid}.jpg`)
 }
 
 module.exports.install = async addon => {
-    await internalInstall( `${Paths.getSteamApplications()}/common/Left 4 Dead 2/left4dead2/addons`, addon)
+    await internalInstall( `${Paths.getSteamApplications()}/common/${Game.getName()}/${Game.getSubdirectory()}/addons`, addon)
 }
 
 module.exports.download = async addon => {

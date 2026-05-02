@@ -8,14 +8,15 @@ const Collections = require("../internal/collections")
 const Paths = require("../internal/paths")
 const Logger = require("../internal/logger")
 const Strings = require("../internal/strings")
+const Game = require("../internal/game")
 
 module.exports = require("../internal/argument")("Uninstall addon", ["<addon/--all>"], async () => {
     if (process.argv[4] === "--all") {
         Logger.log("Uninstalling all addons")
-        rmSync(`${Paths.getSteamApplications()}/common/Left 4 Dead 2/left4dead2/addons`, {
+        rmSync(`${Paths.getSteamApplications()}/common/${Game.getName()}/${Game.getSubdirectory()}/addons`, {
             recursive: true
         })
-        mkdirSync(`${Paths.getSteamApplications()}/common/Left 4 Dead 2/left4dead2/addons`)
+        mkdirSync(`${Paths.getSteamApplications()}/common/${Game.getName()}/${Game.getSubdirectory()}/addons`)
 
         for (const collection of Collections.getEnabled())
             await Collections.install(collection)
@@ -23,15 +24,15 @@ module.exports = require("../internal/argument")("Uninstall addon", ["<addon/--a
         return
     }
 
-    for (const file of readdirSync(`${Paths.getSteamApplications()}/common/Left 4 Dead 2/left4dead2/addons`)) {
-        if (!file.endsWith(".vpk"))
+    for (const file of readdirSync(`${Paths.getSteamApplications()}/common/${Game.getName()}/${Game.getSubdirectory()}/addons`)) {
+        if (!file.endsWith(`.${Game.getAddonExtension()}`))
             continue
 
         const details = Addons.find(process.argv[4], true)
         let logged = []
 
         for (const addon of details) {
-            if (file !== addon.publishedfileid && file !== `${addon.publishedfileid}.jpg` && file !== `${addon.publishedfileid}.vpk`)
+            if (file !== addon.publishedfileid && file !== `${addon.publishedfileid}.jpg` && file !== `${addon.publishedfileid}.${Game.getAddonExtension()}`)
                 continue
 
             if (!logged.includes(addon.publishedfileid)) {
@@ -40,7 +41,7 @@ module.exports = require("../internal/argument")("Uninstall addon", ["<addon/--a
                 logged.push(addon.publishedfileid)
             }
 
-            unlinkSync(`${Paths.getSteamApplications()}/common/Left 4 Dead 2/left4dead2/addons/${file}`)
+            unlinkSync(`${Paths.getSteamApplications()}/common/${Game.getName()}/${Game.getSubdirectory()}/addons/${file}`)
         }
     }
 })

@@ -8,6 +8,7 @@ const Logger = require("../internal/logger")
 const Paths = require("../internal/paths")
 const Addons = require("../internal/addons")
 const Strings = require("../internal/strings")
+const Game = require("../internal/game")
 
 const deletePathIfExists = (path, recursive) => {
     if (!existsSync(path))
@@ -41,9 +42,9 @@ module.exports = require("../internal/argument")("Uninstall a collection", ["<co
 
             Logger.log(`Deleting: [${loggingAddon.publishedfileid}] ${Strings.removeNewlineEnd(loggingAddon.title)}`)
             Logger.debug(loggingAddon.publishedfileid)
-            deletePathIfExists(`${Paths.getSteamApplications()}/common/Left 4 Dead 2/left4dead2/addons/${addon}`, true)
-            deletePathIfExists(`${Paths.getSteamApplications()}/common/Left 4 Dead 2/left4dead2/addons/${addon}.vpk`, false)
-            deletePathIfExists(`${Paths.getSteamApplications()}/common/Left 4 Dead 2/left4dead2/addons/${addon}.jpg`, false)
+            deletePathIfExists(`${Paths.getSteamApplications()}/common/${Game.getName()}/${Game.getSubdirectory()}/addons/${addon}`, true)
+            deletePathIfExists(`${Paths.getSteamApplications()}/common/${Game.getName()}/${Game.getSubdirectory()}/addons/${addon}.${Game.getAddonExtension()}`, false)
+            deletePathIfExists(`${Paths.getSteamApplications()}/common/${Game.getName()}/${Game.getSubdirectory()}/addons/${addon}.jpg`, false)
         }
     }
 
