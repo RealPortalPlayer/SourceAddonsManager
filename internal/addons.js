@@ -190,7 +190,6 @@ module.exports.print = (addon, includeDescriptions) => {
     }
 
     if (addon.result !== 1) {
-        console.log(addon.result)
         addon.title = "<[KRATCY]: THIS ADDON IS UNAVAILABLE ON THE STEAM WORKSHOP>"
         addon.description = "<[KRATCY]: THIS ADDON IS UNAVAILABLE ON THE STEAM WORKSHOP>"
     }
