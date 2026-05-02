@@ -1,7 +1,7 @@
 // Purpose: Addon management
 // Created on: 5/1/26 @ 2:29 AM
 
-const {writeFileSync, rmSync, existsSync, mkdirSync, cpSync} = require("fs")
+const {writeFileSync, rmSync, existsSync, cpSync} = require("fs")
 const {execSync} = require("child_process")
 
 const Strings = require("./strings")

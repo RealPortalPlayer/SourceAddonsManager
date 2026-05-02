@@ -19,7 +19,7 @@ const deletePathIfExists = (path, recursive) => {
 }
 
 module.exports = require("../internal/argument")("Uninstall a collection", ["<collection>"], () => {
-    const collection = Collections.get(process.argv[3])
+    const collection = Collections.get(process.argv[4])
 
     if (collection == null) {
         Logger.log(`Collection not found`)

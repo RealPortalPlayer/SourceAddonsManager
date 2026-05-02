@@ -18,8 +18,8 @@ const main = async () => {
         validArguments[argument.substring(0, argument.length - 3)] = require(`${__dirname}//argument/${argument}`)
     }
 
-    if (process.argv.length <= 2) {
-        Logger.log(`${basename(process.argv[1])} <operation> [...]`)
+    if (process.argv.length <= 3) {
+        Logger.log(`${basename(process.argv[1])} <game> <operation> [...]`)
 
         for (const argument in validArguments) {
             const value = validArguments[argument]
@@ -35,10 +35,10 @@ const main = async () => {
         process.exit(6)
     }
 
-    const argument = validArguments[process.argv[2]]
+    const argument = validArguments[process.argv[3]]
 
     if (argument == null) {
-        Logger.log(`Invalid option: ${process.argv[2]}`)
+        Logger.log(`Invalid option: ${process.argv[3]}`)
         process.exit(1)
     }
 

@@ -4,5 +4,5 @@
 const Collections = require("../internal/collections")
 
 module.exports = require("../internal/argument")("Install collection", ["<collection>"], async () => {
-    await Collections.install(Collections.get(process.argv[3]))
+    await Collections.install(Collections.get(process.argv[4]))
 })

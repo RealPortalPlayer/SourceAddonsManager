@@ -4,5 +4,5 @@
 const Collections = require("../internal/collections")
 
 module.exports =  require("../internal/argument")("Toggle collection", ["<collection>"], async () => {
-    Collections.toggle(process.argv[3])
+    Collections.toggle(process.argv[4])
 })

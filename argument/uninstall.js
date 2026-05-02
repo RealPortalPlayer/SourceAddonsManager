@@ -10,7 +10,7 @@ const Logger = require("../internal/logger")
 const Strings = require("../internal/strings")
 
 module.exports = require("../internal/argument")("Uninstall addon", ["<addon/--all>"], async () => {
-    if (process.argv[3] === "--all") {
+    if (process.argv[4] === "--all") {
         Logger.log("Uninstalling all addons")
         rmSync(`${Paths.getSteamApplications()}/common/Left 4 Dead 2/left4dead2/addons`, {
             recursive: true
@@ -27,7 +27,7 @@ module.exports = require("../internal/argument")("Uninstall addon", ["<addon/--a
         if (!file.endsWith(".vpk"))
             continue
 
-        const details = Addons.find(process.argv[3], true)
+        const details = Addons.find(process.argv[4], true)
         let logged = []
 
         for (const addon of details) {

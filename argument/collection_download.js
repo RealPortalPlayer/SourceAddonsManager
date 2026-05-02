@@ -4,5 +4,5 @@
 const Collections = require("../internal/collections")
 
 module.exports = require("../internal/argument")("Download entire collections", ["<collection>"], async () => {
-    await Collections.download(Collections.get(process.argv[3]))
+    await Collections.download(Collections.get(process.argv[4]))
 })

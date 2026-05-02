@@ -6,5 +6,5 @@ const Strings = require("../internal/strings")
 
 module.exports = require("../internal/argument")("List all addons", ["[--include_descriptions]"], () => {
     for (const addon of Addons.getAll())
-        Addons.print(addon, process.argv[3] === "--include_descriptions")
+        Addons.print(addon, process.argv[4] === "--include_descriptions")
 })
