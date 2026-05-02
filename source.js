@@ -38,7 +38,7 @@ const main = async () => {
     const argument = validArguments[process.argv[2]]
 
     if (argument == null) {
-        Logger.error(`Invalid option: ${process.argv[2]}`)
+        Logger.log(`Invalid option: ${process.argv[2]}`)
         process.exit(1)
     }
 
