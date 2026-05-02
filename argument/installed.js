@@ -19,7 +19,7 @@ module.exports = require("../internal/argument")("Tell what addons you got insta
             if (addon.endsWith(".jpg") || !addon.endsWith(`.${Game.getAddonExtension()}`))
                 continue
 
-            id = addon.substring(0, id.length - 4)
+            id = addon.substring(0, addon.length - 4)
         }
 
         Addons.print(Addons.find(id, false)[0], false)
