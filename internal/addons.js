@@ -78,7 +78,7 @@ module.exports.find = (addonName, fuzzy) => {
 }
 
 const internalInstall = async (path, addon) => {
-    if (existsSync(`${path}/${addon.publishedfileid}`)) {
+    if (existsSync(`${path}/${addon.publishedfileid}.${Game.getAddonExtension()}`)) {
         Logger.log(`Already downloaded addon: [${addon.publishedfileid}] ${Strings.removeNewlineEnd(addon.title)}`)
         return
     }
@@ -103,6 +103,12 @@ const internalInstall = async (path, addon) => {
     }
 
     writeFileSync(`${path}/${addon.publishedfileid}.jpg`, await jpg.bytes())
+
+    // FIXME: Extracting addons can break certain addons.
+    //        Adding the image to the VPK via `--add-image` seems broken right now.
+    //        And trying the repack the addon seems to randomly hang.
+    if (true)
+        return
 
     // TODO: Not all games uses VPK
     let vpkedit = null
