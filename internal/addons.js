@@ -108,7 +108,7 @@ const internalInstall = async (path, addon) => {
     // FIXME: Extracting addons can break certain addons.
     //        Adding the image to the VPK via `--add-image` seems broken right now.
     //        And trying the repack the addon seems to randomly hang.
-    if (true)
+    if (path !== Paths.getConfiguration())
         return
 
     // TODO: Not all games uses VPK
