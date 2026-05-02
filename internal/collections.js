@@ -36,12 +36,16 @@ module.exports.initialize = async () => {
         const oldCollection = module.exports.get(collection.name)
 
         if (oldCollection == null) {
+            collection.local = true
+
             collections.push(collection)
             continue
         }
 
         if (collection.override) {
             collections = collections.filter(found => found.name !== collection.name)
+
+            oldCollection.local = true
 
             collections.push(collection)
             continue
@@ -50,6 +54,8 @@ module.exports.initialize = async () => {
         for (const id of collection.ids) {
             if (oldCollection.ids.includes(id))
                 continue
+
+            oldCollection.modified = true
 
             oldCollection.ids.push(id)
         }
@@ -94,8 +100,17 @@ module.exports.getEnabled = () => {
 }
 
 module.exports.print = (collection, includeAddons) => {
+    let badge = "[P]"
+
+    if (collection.modified)
+        badge = "[M]"
+    else if (collection.local)
+        badge = "[L]"
+    else if (collection.generated)
+        badge = "[G]"
+
     Logger.debug(collection.name)
-    Logger.log(`${localCollections.enabled.includes(collection.name) ? "* " : "  "}${collection.name}${includeAddons ? ":" : ""}`)
+    Logger.log(`${localCollections.enabled.includes(collection.name) ? "* " : "  "}${badge} ${collection.name}${includeAddons ? ":" : ""}`)
 
     if (!includeAddons)
         return
