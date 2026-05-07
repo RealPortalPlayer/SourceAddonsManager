@@ -24,8 +24,20 @@ module.exports.initialize = async () => {
 
     // FIXME: This sucks, but there isn't really much we can do about it... Too bad.
 
-    const handmadeCollections  = await (await fetchit(Configuration.getHandmadeCollectionsURL())).json()
-    const generatedCollections  = await (await fetchit(Configuration.getGeneratedCollectionsURL())).json()
+    let handmadeCollections = []
+    let generatedCollections = []
+
+    try {
+        handmadeCollections = await (await fetchit(Configuration.getHandmadeCollectionsURL())).json()
+    } catch {
+        // intentionally ignored
+    }
+
+    try {
+        generatedCollections = await (await fetchit(Configuration.getGeneratedCollectionsURL())).json()
+    } catch {
+        // intentionally ignored
+    }
 
     collections = []
     collections.push(...handmadeCollections)
