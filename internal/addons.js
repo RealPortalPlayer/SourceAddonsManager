@@ -10,12 +10,13 @@ const Logger = require("./logger")
 const Collections = require("./collections")
 const fetchit = require("./fetchit")
 const Game = require("./game")
+const Configuration = require("../internal/configuration")
 
 let mods = null
 
 module.exports.initialize = async () => {
     // FIXME: This sucks, but there isn't really much we can do about it... Too bad.
-    mods = await (await fetchit(`http://10.0.44.20:5113/Mods/${Game.getName()}/data.json`)).json()
+    mods = await (await fetchit(Configuration.getDataURL())).json()
 }
 
 module.exports.getAll = () => mods.response.publishedfiledetails
@@ -85,7 +86,7 @@ const internalInstall = async (path, addon) => {
 
     Logger.log(`Downloading: [${addon.publishedfileid}] ${Strings.removeNewlineEnd(addon.title)}`)
 
-    const vpk = await fetchit(`http://10.0.44.20:5113/Mods/${Game.getName()}/${addon.publishedfileid}.${Game.getAddonExtension()}`)
+    const vpk = await fetchit(Configuration.getVPKURL(addon.publishedfileid))
 
     if (!vpk.ok) {
         Logger.log("Error while trying to download addon from server")
@@ -94,7 +95,7 @@ const internalInstall = async (path, addon) => {
 
     writeFileSync(`${path}/${addon.publishedfileid}.${Game.getAddonExtension()}`, await vpk.bytes())
 
-    const jpg = await fetchit(`http://10.0.44.20:5113/Mods/${Game.getName()}/${addon.publishedfileid}.jpg`)
+    const jpg = await fetchit(Configuration.getJPGURL(addon.publishedfileid))
 
     if (!jpg.ok) {
         Logger.log("Error while trying to download image from server. Was this addon unavailable when added?")

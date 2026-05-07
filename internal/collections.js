@@ -7,7 +7,7 @@ const Addons = require("./addons")
 const Paths = require("./paths")
 const Logger = require("./logger")
 const fetchit = require("./fetchit")
-const Game = require("./game")
+const Configuration = require("../internal/configuration")
 
 let collections = null
 let localCollections = null
@@ -24,8 +24,8 @@ module.exports.initialize = async () => {
 
     // FIXME: This sucks, but there isn't really much we can do about it... Too bad.
 
-    const handmadeCollections  = await (await fetchit(`http://10.0.44.20:5113/Mods/${Game.getName()}/collections.json`)).json()
-    const generatedCollections  = await (await fetchit(`http://10.0.44.20:5113/Mods/${Game.getName()}/generated_collections.json`)).json()
+    const handmadeCollections  = await (await fetchit(Configuration.getHandmadeCollectionsURL())).json()
+    const generatedCollections  = await (await fetchit(Configuration.getGeneratedCollectionsURL())).json()
 
     collections = []
     collections.push(...handmadeCollections)
