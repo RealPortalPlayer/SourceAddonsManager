@@ -19,7 +19,7 @@ module.exports = require("../internal/argument")("Uninstall addon", ["<addons/--
         mkdirSync(`${Paths.getSteamApplications()}/common/${Game.getName()}/${Game.getSubdirectory()}/addons`)
 
         for (const collection of Manager.getEnabledCollections())
-            await Manager.install(collection[0].name)
+            await Manager.install(collection)
 
         return
     }
