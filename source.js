@@ -4,10 +4,9 @@
 const {basename} = require("path")
 const {readdirSync} = require("fs")
 
-const Addons = require("./internal/addons")
-const Collections = require("./internal/collections")
 const Logger = require("./internal/logger")
 const Game = require("./internal/game")
+const Manager = require("./internal/manager")
 
 const main = async () => {
     const validArguments = {}
@@ -16,7 +15,9 @@ const main = async () => {
         if (!argument.endsWith(".js"))
             continue
 
-        validArguments[argument.substring(0, argument.length - 3)] = require(`${__dirname}//argument/${argument}`)
+        try {
+            validArguments[argument.substring(0, argument.length - 3)] = require(`${__dirname}//argument/${argument}`)
+        } catch {}
     }
 
     if (process.argv.length <= 3) {
@@ -49,8 +50,7 @@ const main = async () => {
     }
 
     Game.initialize()
-    await Addons.initialize()
-    await Collections.initialize()
+    await Manager.initialize()
     await argument.action()
 }
 

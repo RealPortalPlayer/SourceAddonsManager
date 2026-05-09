@@ -3,11 +3,11 @@
 
 const {existsSync, mkdirSync, writeFileSync} = require("fs")
 
-const Addons = require("./addons")
-const Paths = require("./paths")
-const Logger = require("./logger")
-const fetchit = require("./fetchit")
-const Configuration = require("../internal/configuration")
+const Paths = require("../paths")
+const Logger = require("../logger")
+const fetchit = require("../fetchit")
+const Configuration = require("../configuration")
+const Manager = require("../manager")
 
 let collections = null
 let localCollections = null
@@ -46,7 +46,7 @@ module.exports.initialize = async () => {
     localCollections = require(Paths.getLocalCollections())
 
     for (const collection of localCollections.local) {
-        const oldCollection = module.exports.get(collection.name)
+        const oldCollection = module.exports.get(collection.name)[0]
 
         if (oldCollection == null) {
             collection.local = true
@@ -75,31 +75,7 @@ module.exports.initialize = async () => {
     }
 }
 
-module.exports.get = name => collections.filter(found => found.name === name)[0]
-
-module.exports.install = async collection => {
-    if (collection == null) {
-        Logger.error(`Collection not found`)
-        return
-    }
-
-    Logger.log(`Installing collection: ${collection.name}`)
-    await Addons.installList(collection.ids)
-}
-
-module.exports.download = async collection => {
-    if (collection == null) {
-        Logger.error(`Collection not found`)
-        return
-    }
-
-    if (!existsSync(`${process.cwd()}/${collection.name}`))
-        mkdirSync(`${process.cwd()}/${collection.name}`)
-
-    process.chdir(`${process.cwd()}/${collection.name}`)
-    Logger.log(`Downloading collection: ${collection.name}`)
-    await Addons.downloadList(collection.ids)
-}
+module.exports.get = name => collections.filter(found => found.name === name)
 
 module.exports.getAll = () => collections
 
@@ -107,13 +83,13 @@ module.exports.getEnabled = () => {
     let array = []
 
     for (const collection of localCollections.enabled)
-        array.push(module.exports.get(collection))
+        array.push(module.exports.get(collection)[0].name)
 
     return array
 }
 
 module.exports.toggle = name => {
-    const collection = module.exports.get(name)
+    const collection = module.exports.get(name)[0]
 
     if (collection == null) {
         Logger.error(`Collection not found: ${name}`)
@@ -159,7 +135,7 @@ module.exports.addLocal = (name, addon, override) => {
 
         collection.ids.push(addon)
     } else {
-        const addons = Addons.find(addon, false)
+        const addons = Manager.get(addon, false)
         let added = 0
 
         for (const found of addons) {

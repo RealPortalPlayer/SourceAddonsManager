@@ -1,13 +1,12 @@
 // Purpose: Show stats
 // Created on: 5/1/26 @ 4:04 AM
 
-const Collections = require("../internal/collections")
-const Addons = require("../internal/addons")
 const Logger =  require("../internal/logger")
+const Manager = require("../internal/manager")
 
 module.exports = require("../internal/argument")("Show stats", [], () => {
-    Logger.debug(Addons.getAll().length)
-    Logger.debug(Collections.getAll().length)
-    Logger.log(`Addons: ${Addons.getAll().length}`)
-    Logger.log(`Collections: ${Collections.getEnabled().length}/${Collections.getAll().length}`)
+    Logger.debug(Manager.getAllAddons().length)
+    Logger.debug(Manager.getAllCollections().length)
+    Logger.log(`Addons: ${Manager.getAllAddons().length}`)
+    Logger.log(`Collections: ${Manager.getEnabledCollections().length}/${Manager.getAllCollections().length}`)
 })

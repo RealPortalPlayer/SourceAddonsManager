@@ -4,13 +4,12 @@
 const {writeFileSync, rmSync, existsSync, cpSync} = require("fs")
 const {execSync} = require("child_process")
 
-const Strings = require("./strings")
-const Paths = require("./paths")
-const Logger = require("./logger")
-const Collections = require("./collections")
-const fetchit = require("./fetchit")
-const Game = require("./game")
-const Configuration = require("../internal/configuration")
+const Strings = require("../strings")
+const Paths = require("../paths")
+const Logger = require("../logger")
+const fetchit = require("../fetchit")
+const Game = require("../game")
+const Configuration = require("../configuration")
 
 let mods = null
 let dependencies = null
@@ -38,18 +37,7 @@ module.exports.initialize = async () => {
 
 module.exports.getAll = () => mods.response.publishedfiledetails
 
-module.exports.findOrExit = (addonName, fuzzy) => {
-    const addons = module.exports.find(addonName, fuzzy)
-
-    if (addons.length === 0) {
-        Logger.error("Found no addons")
-        process.exit(4)
-    }
-
-    return addons
-}
-
-module.exports.find = (addonName, fuzzy) => {
+module.exports.get = (addonName, fuzzy) => {
     addonName = addonName.toLowerCase()
 
     let checkTitle = title => title.toLowerCase().includes(addonName)
@@ -64,8 +52,8 @@ module.exports.find = (addonName, fuzzy) => {
 }
 
 const internalInstall = async (path, addon) => {
-    if (dependencies[addon.publishedfileid] != null)
-        await internalInstallList(module.exports.install, Collections.install, dependencies[addon.publishedfileid])
+    // if (dependencies[addon.publishedfileid] != null)
+    //     await internalInstallList(module.exports.install, Collections.install, dependencies[addon.publishedfileid])
 
     if (existsSync(`${path}/${addon.publishedfileid}.${Game.getAddonExtension()}`)) {
         Logger.error(`Already downloaded addon: [${addon.publishedfileid}] ${Strings.removeNewlineEnd(addon.title)}`)
@@ -189,71 +177,4 @@ module.exports.download = async addon => {
     rmSync(`${Paths.getConfiguration()}/${addon.publishedfileid}`, {
         recursive: true
     })
-}
-
-module.exports.print = (addon, includeDescriptions) => {
-    if (process.env.SAM_PARSABLE === "1") {
-        Logger.debug(addon.publishedfileid)
-        return
-    }
-
-    if (addon.result !== 1) {
-        addon.title = "<[KRATCY]: THIS ADDON IS UNAVAILABLE ON THE STEAM WORKSHOP>"
-        addon.description = "<[KRATCY]: THIS ADDON IS UNAVAILABLE ON THE STEAM WORKSHOP>"
-    }
-
-    let finalString = ""
-
-    if (includeDescriptions)
-        finalString += "\n============================================ "
-
-    finalString += `[${addon.publishedfileid}] `
-
-    if (includeDescriptions)
-        finalString += "Addon: "
-
-    finalString += Strings.removeNewlineEnd(addon.title)
-
-    if (includeDescriptions)
-        finalString += `\n${Strings.removeNewlineEnd(addon.description)}`
-
-    Logger.log(finalString)
-}
-
-let ignorelist = []
-
-const internalInstallList = async (addonFunction, collectionFunction, ids) => {
-    for (const id of ids) {
-        {
-            const collection = Collections.get(id)
-
-            if (collection != null) {
-                if (ignorelist.includes(id)) {
-                    Logger.error(`Recursion prevented. Collection already installed earlier: ${id}`)
-                    continue
-                }
-
-                ignorelist.push(id)
-                await (collectionFunction)(collection)
-                continue
-            }
-        }
-
-        const details = module.exports.find(id, false)
-
-        if (details.length === 0 || details.length > 1) {
-            Logger.error(`???????????????? ${id}, ${details.length}`)
-            continue
-        }
-
-        await (addonFunction)(details[0])
-    }
-}
-
-module.exports.installList = async ids => {
-    await internalInstallList(module.exports.install, Collections.install, ids)
-}
-
-module.exports.downloadList = async ids => {
-    await internalInstallList(module.exports.download, Collections.download, ids)
 }

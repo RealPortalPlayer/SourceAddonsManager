@@ -4,8 +4,8 @@
 const {readdirSync, statSync} = require("fs")
 
 const Paths = require("../internal/paths")
-const Addons = require("../internal/addons")
 const Game = require("../internal/game")
+const Manager = require("../internal/manager")
 
 module.exports = require("../internal/argument")("Tell what addons you got installed", [], () => {
     const addons = readdirSync(`${Paths.getSteamApplications()}/common/${Game.getName()}/${Game.getSubdirectory()}/addons`)
@@ -22,6 +22,6 @@ module.exports = require("../internal/argument")("Tell what addons you got insta
             id = addon.substring(0, addon.length - 4)
         }
 
-        Addons.print(Addons.find(id, false)[0], false)
+        Manager.print(id, false)
     }
 })
