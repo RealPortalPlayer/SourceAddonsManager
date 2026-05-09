@@ -188,8 +188,8 @@ module.exports.addLocal = (name, addon, override) => {
 
     if (testCollection != null) {
         if (collection.ids.includes(addon)) {
-            Logger.error("Collection was left unmodified")
-            process.exit(1)
+            Logger.error(`Collection already includes collection: ${addon}`)
+            return
         }
 
         Logger.log(`Adding collection to collection: ${name} <- ${addon}`)
@@ -211,8 +211,8 @@ module.exports.addLocal = (name, addon, override) => {
         }
 
         if (added === 0) {
-            Logger.error("Collection was left unmodified")
-            process.exit(1)
+            Logger.error(`Collection already includes: ${addon}`)
+            return
         }
     }
 

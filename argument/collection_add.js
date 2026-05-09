@@ -3,14 +3,39 @@
 
 const Collections = require("../internal/collections")
 const Addons = require("../internal/addons")
+const ArgumentManager = require("../internal/argument_manager")
+const Logger = require("../internal/logger")
 
-module.exports = require("../internal/argument")("Add to a local collection", ["<name>", "<addon>", "[--override]"], async () => {
-    Collections.addLocal(process.argv[4], process.argv[5], process.argv[6] === "--override")
+module.exports = require("../internal/argument")("Add to a local collection", ["<name>", "<addons>", "[--override]"], async () => {
+    const addons = ArgumentManager.getAddons()
+    const collectionName = addons.shift()
+    const override = ArgumentManager.includesArgument("--override")
+    const collection = Collections.get(collectionName)
 
-    const collection = Collections.get(process.argv[4])
+    if (addons.length === 0) {
+        Logger.error("No addons specified")
+        process.exit(2)
+    }
 
-    if (!Collections.getEnabled().includes(collection))
-        return
+    for (const addon of addons) {
+        let foundAddon = Addons.find(addon, false)
+        let installFunction = Addons.install
 
-    await Addons.install(Addons.findOrExit(process.argv[5], false)[0])
+        if (foundAddon == null) {
+            foundAddon = Collections.getEnabled(addon)
+            installFunction = Collections.install
+
+            if (foundAddon == null) {
+                Logger.error(`Failed to find addon: ${addon}`)
+                process.exit(4)
+            }
+        }
+
+        Collections.addLocal(collectionName, addon, override)
+
+        if (!Collections.getEnabled().includes(collection))
+            continue
+
+        await (installFunction)(foundAddon)
+    }
 })

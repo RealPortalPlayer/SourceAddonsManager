@@ -9,9 +9,10 @@ const Paths = require("../internal/paths")
 const Logger = require("../internal/logger")
 const Strings = require("../internal/strings")
 const Game = require("../internal/game")
+const ArgumentManager = require("../internal/argument_manager")
 
-module.exports = require("../internal/argument")("Uninstall addon", ["<addon/--all>"], async () => {
-    if (process.argv[4] === "--all") {
+module.exports = require("../internal/argument")("Uninstall addon", ["<addons/--all>"], async () => {
+    if (ArgumentManager.includesArgument("--all")) {
         Logger.log("Uninstalling all addons")
         rmSync(`${Paths.getSteamApplications()}/common/${Game.getName()}/${Game.getSubdirectory()}/addons`, {
             recursive: true
@@ -24,63 +25,67 @@ module.exports = require("../internal/argument")("Uninstall addon", ["<addon/--a
         return
     }
 
-    {
-        const collection = Collections.get(process.argv[4])
+    for (const addon of ArgumentManager.getAddons()) {
+        {
+            const collection = Collections.get(addon)
 
-        if (collection != null) {
-            const deletePathIfExists = (path, recursive) => {
-                if (!existsSync(path))
-                    return
+            if (collection != null) {
+                const deletePathIfExists = (path, recursive) => {
+                    if (!existsSync(path))
+                        return
 
-                rmSync(path, {
-                    recursive
-                })
-            }
-
-            const uninstall = selected => {
-                for (const addon of selected.ids) {
-                    {
-                        const foundCollection = Collections.get(addon)
-
-                        if (foundCollection != null) {
-                            uninstall(foundCollection)
-                            return
-                        }
-                    }
-
-                    const loggingAddon = Addons.findOrExit(addon, false)[0]
-
-                    Logger.log(`Deleting: [${loggingAddon.publishedfileid}] ${Strings.removeNewlineEnd(loggingAddon.title)}`)
-                    Logger.debug(loggingAddon.publishedfileid)
-                    deletePathIfExists(`${Paths.getSteamApplications()}/common/${Game.getName()}/${Game.getSubdirectory()}/addons/${addon}`, true)
-                    deletePathIfExists(`${Paths.getSteamApplications()}/common/${Game.getName()}/${Game.getSubdirectory()}/addons/${addon}.${Game.getAddonExtension()}`, false)
-                    deletePathIfExists(`${Paths.getSteamApplications()}/common/${Game.getName()}/${Game.getSubdirectory()}/addons/${addon}.jpg`, false)
+                    rmSync(path, {
+                        recursive
+                    })
                 }
+
+                const uninstall = selected => {
+                    for (const addon of selected.ids) {
+                        {
+                            const foundCollection = Collections.get(addon)
+
+                            if (foundCollection != null) {
+                                uninstall(foundCollection)
+                                return
+                            }
+                        }
+
+                        const loggingAddon = Addons.findOrExit(addon, false)[0]
+
+                        Logger.log(`Deleting: [${loggingAddon.publishedfileid}] ${Strings.removeNewlineEnd(loggingAddon.title)}`)
+                        Logger.debug(loggingAddon.publishedfileid)
+                        deletePathIfExists(`${Paths.getSteamApplications()}/common/${Game.getName()}/${Game.getSubdirectory()}/addons/${addon}`, true)
+                        deletePathIfExists(`${Paths.getSteamApplications()}/common/${Game.getName()}/${Game.getSubdirectory()}/addons/${addon}.${Game.getAddonExtension()}`, false)
+                        deletePathIfExists(`${Paths.getSteamApplications()}/common/${Game.getName()}/${Game.getSubdirectory()}/addons/${addon}.jpg`, false)
+                    }
+                }
+
+                uninstall(collection)
+                continue
             }
-
-            uninstall(collection)
-            return
         }
-    }
 
-    for (const file of readdirSync(`${Paths.getSteamApplications()}/common/${Game.getName()}/${Game.getSubdirectory()}/addons`)) {
-        if (!file.endsWith(`.${Game.getAddonExtension()}`))
-            continue
-
-        const details = Addons.findOrExit(process.argv[4], true)
-        let logged = []
-
-        for (const addon of details) {
-            if (file !== addon.publishedfileid && file !== `${addon.publishedfileid}.jpg` && file !== `${addon.publishedfileid}.${Game.getAddonExtension()}`)
+        for (const file of readdirSync(`${Paths.getSteamApplications()}/common/${Game.getName()}/${Game.getSubdirectory()}/addons`)) {
+            if (!file.endsWith(`.${Game.getAddonExtension()}`))
                 continue
 
-            if (!logged.includes(addon.publishedfileid)) {
-                Logger.log(`Deleting: [${addon.publishedfileid}] ${Strings.removeNewlineEnd(addon.title)}`)
-                Logger.debug(addon.publishedfileid)
-                logged.push(addon.publishedfileid)
-            }
+            const details = Addons.findOrExit(addon, false)
+            let logged = []
 
-            unlinkSync(`${Paths.getSteamApplications()}/common/${Game.getName()}/${Game.getSubdirectory()}/addons/${file}`)
+            for (const addon of details) {
+                if (file !== addon.publishedfileid && file !== `${addon.publishedfileid}.jpg` && file !== `${addon.publishedfileid}.${Game.getAddonExtension()}`)
+                    continue
+
+                if (!logged.includes(addon.publishedfileid)) {
+                    Logger.log(`Deleting: [${addon.publishedfileid}] ${Strings.removeNewlineEnd(addon.title)}`)
+                    Logger.debug(addon.publishedfileid)
+                    logged.push(addon.publishedfileid)
+                }
+
+                unlinkSync(`${Paths.getSteamApplications()}/common/${Game.getName()}/${Game.getSubdirectory()}/addons/${file}`)
+            }
         }
     }
+
+
 })
