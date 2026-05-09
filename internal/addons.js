@@ -13,10 +13,18 @@ const Game = require("./game")
 const Configuration = require("../internal/configuration")
 
 let mods = null
+let dependencies = null
 
 module.exports.initialize = async () => {
     // FIXME: This sucks, but there isn't really much we can do about it... Too bad.
     mods = await (await fetchit(Configuration.getDataURL())).json()
+    dependencies = []
+
+    try {
+        dependencies = await (await fetchit(Configuration.getAddonsDependenciesURL())).json()
+    } catch {
+        // intentionally ignored
+    }
 }
 
 module.exports.getAll = () => mods.response.publishedfiledetails
@@ -79,6 +87,9 @@ module.exports.find = (addonName, fuzzy) => {
 }
 
 const internalInstall = async (path, addon) => {
+    if (dependencies[addon.publishedfileid] != null)
+        await internalInstallList(module.exports.install, Collections.install, dependencies[addon.publishedfileid])
+
     if (existsSync(`${path}/${addon.publishedfileid}.${Game.getAddonExtension()}`)) {
         Logger.log(`Already downloaded addon: [${addon.publishedfileid}] ${Strings.removeNewlineEnd(addon.title)}`)
         return

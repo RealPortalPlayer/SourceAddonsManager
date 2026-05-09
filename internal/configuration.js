@@ -12,3 +12,4 @@ module.exports.getVPKURL = name => parseGame(configuration.vpk).replaceAll("$2",
 module.exports.getJPGURL = name => parseGame(configuration.jpg).replaceAll("$2", name)
 module.exports.getHandmadeCollectionsURL = () => parseGame(configuration.handmade_collections)
 module.exports.getGeneratedCollectionsURL = () => parseGame(configuration.generated_collections)
+module.exports.getAddonsDependenciesURL = () => parseGame(configuration.addons_dependencies)

@@ -4,5 +4,6 @@
     "vpk": "/Mods/$1/$2.$3",
     "jpg":"/Mods/$1/$2.jpg",
     "handmade_collections": "/Mods/$1/collections.json",
-    "generated_collections": "/Mods/$1/generated_collections.json"
+    "generated_collections": "/Mods/$1/generated_collections.json",
+    "addons_dependencies": "/Mods/$1/dependencies.json"
 }
