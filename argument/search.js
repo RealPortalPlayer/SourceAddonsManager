@@ -4,6 +4,6 @@
 const Addons = require("../internal/addons")
 
 module.exports = require("../internal/argument")("Search addons", ["<addon>"], () => {
-    for (const addon of Addons.find(process.argv[4], true))
+    for (const addon of Addons.findOrExit(process.argv[4], true))
         Addons.print(addon, false)
 })

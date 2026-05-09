@@ -15,7 +15,7 @@ module.exports = require("../internal/argument")("Download an addon in the curre
         }
     }
 
-    const addons = Addons.find(process.argv[4], false)
+    const addons = Addons.findOrExit(process.argv[4], false)
 
     if (addons.length > 1) {
         Logger.log("Found more than one addon. Search to narrow it down")

@@ -128,8 +128,25 @@ module.exports.print = (collection, includeAddons) => {
     if (!includeAddons)
         return
 
-    for (const addon of collection.ids)
-        Addons.print(Addons.find(addon, false)[0], false)
+    for (const addon of collection.ids) {
+        const foundAddon = Addons.find(addon, false)[0]
+
+        if (foundAddon == null) {
+            const testCollection = module.exports.get(addon)
+
+            if (testCollection != null) {
+                Logger.debug(addon)
+                Logger.log(`[COLLECTION] ${addon}`)
+                continue
+            }
+
+            Logger.log(`RIP: ${addon}`)
+            continue
+        }
+
+        Addons.print(foundAddon, false)
+    }
+
 }
 
 module.exports.toggle = name => {

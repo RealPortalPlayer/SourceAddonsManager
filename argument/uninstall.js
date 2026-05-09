@@ -48,7 +48,7 @@ module.exports = require("../internal/argument")("Uninstall addon", ["<addon/--a
                         }
                     }
 
-                    const loggingAddon = Addons.find(addon, false)[0]
+                    const loggingAddon = Addons.findOrExit(addon, false)[0]
 
                     Logger.log(`Deleting: [${loggingAddon.publishedfileid}] ${Strings.removeNewlineEnd(loggingAddon.title)}`)
                     Logger.debug(loggingAddon.publishedfileid)
@@ -67,7 +67,7 @@ module.exports = require("../internal/argument")("Uninstall addon", ["<addon/--a
         if (!file.endsWith(`.${Game.getAddonExtension()}`))
             continue
 
-        const details = Addons.find(process.argv[4], true)
+        const details = Addons.findOrExit(process.argv[4], true)
         let logged = []
 
         for (const addon of details) {

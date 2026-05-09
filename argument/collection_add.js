@@ -12,5 +12,5 @@ module.exports = require("../internal/argument")("Add to a local collection", ["
     if (!Collections.getEnabled().includes(collection))
         return
 
-    await Addons.install(Addons.find(process.argv[5], false)[0])
+    await Addons.install(Addons.findOrExit(process.argv[5], false)[0])
 })

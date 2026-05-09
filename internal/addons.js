@@ -29,6 +29,17 @@ module.exports.initialize = async () => {
 
 module.exports.getAll = () => mods.response.publishedfiledetails
 
+module.exports.findOrExit = (addonName, fuzzy) => {
+    const addons = module.exports.find(addonName, fuzzy)
+
+    if (addons.length === 0) {
+        Logger.log("Found no addons")
+        process.exit(4)
+    }
+
+    return addons
+}
+
 module.exports.find = (addonName, fuzzy) => {
     let addons = []
 
@@ -76,11 +87,6 @@ module.exports.find = (addonName, fuzzy) => {
         }
 
         addons.push(addon)
-    }
-
-    if (addons.length === 0) {
-        Logger.log("Found no addons")
-        process.exit(4)
     }
 
     return addons
