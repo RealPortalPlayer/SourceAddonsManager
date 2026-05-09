@@ -20,6 +20,15 @@ module.exports.initialize = async () => {
     mods = await (await fetchit(Configuration.getDataURL())).json()
     dependencies = []
 
+    for (const addon of mods.response.publishedfiledetails) {
+        if (addon.result === 1)
+            continue
+
+        addon.title = "<[KRATCY]: THIS ADDON IS UNAVAILABLE ON THE STEAM WORKSHOP>"
+        addon.description = "<[KRATCY]: THIS ADDON IS UNAVAILABLE ON THE STEAM WORKSHOP>"
+        addon.tags = [{tag: "<[KRATCY]: THIS ADDON IS UNAVAILABLE ON THE STEAM WORKSHOP>"}]
+    }
+
     try {
         dependencies = await (await fetchit(Configuration.getAddonsDependenciesURL())).json()
     } catch {
@@ -41,8 +50,6 @@ module.exports.findOrExit = (addonName, fuzzy) => {
 }
 
 module.exports.find = (addonName, fuzzy) => {
-    let addons = []
-
     addonName = addonName.toLowerCase()
 
     let checkTitle = title => title.toLowerCase().includes(addonName)
@@ -53,43 +60,7 @@ module.exports.find = (addonName, fuzzy) => {
         checkDescription = description => false
     }
 
-    for (const addon of mods.response.publishedfiledetails) {
-        if (addon.result !== 1) {
-            addon.title = "<[KRATCY]: THIS ADDON IS UNAVAILABLE ON THE STEAM WORKSHOP>"
-            addon.description = "<[KRATCY]: THIS ADDON IS UNAVAILABLE ON THE STEAM WORKSHOP>"
-            addon.tags = [{tag: "<[KRATCY]: THIS ADDON IS UNAVAILABLE ON THE STEAM WORKSHOP>"}]
-        }
-
-        if (!checkTitle(addon.title) && !checkDescription(addon.description)) {
-            if (addon.publishedfileid === addonName) {
-                addons.push(addon)
-                continue
-            }
-
-            if (!fuzzy)
-                continue
-
-            let add = false
-
-            for (const tag of addon.tags) {
-                if (!tag.tag.toLowerCase().includes(addonName))
-                    continue
-
-                add = true
-                break
-            }
-
-            if (!add)
-                continue
-
-            addons.push(addon)
-            continue
-        }
-
-        addons.push(addon)
-    }
-
-    return addons
+    return mods.response.publishedfiledetails.filter(addon => addon.publishedfileid === addonName || checkTitle(addon.title) || checkDescription(addon.description) || (fuzzy && addon.tags.filter(tag => tag.tag.toLowerCase().includes(addonName)).length !== 0))
 }
 
 const internalInstall = async (path, addon) => {
