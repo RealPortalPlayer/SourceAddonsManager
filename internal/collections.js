@@ -112,43 +112,6 @@ module.exports.getEnabled = () => {
     return array
 }
 
-module.exports.print = (collection, includeAddons) => {
-    let badge = "[P]"
-
-    if (collection.modified)
-        badge = "[M]"
-    else if (collection.local)
-        badge = "[L]"
-    else if (collection.generated)
-        badge = "[G]"
-
-    Logger.debug(collection.name)
-    Logger.log(`${localCollections.enabled.includes(collection.name) ? "* " : "  "}${badge} ${collection.name}${includeAddons ? ":" : ""}`)
-
-    if (!includeAddons)
-        return
-
-    for (const addon of collection.ids) {
-        const foundAddon = Addons.find(addon, false)[0]
-
-        if (foundAddon == null) {
-            const testCollection = module.exports.get(addon)
-
-            if (testCollection != null) {
-                Logger.debug(addon)
-                Logger.log(`[COLLECTION] ${addon}`)
-                continue
-            }
-
-            Logger.error(`RIP: ${addon}`)
-            continue
-        }
-
-        Addons.print(foundAddon, false)
-    }
-
-}
-
 module.exports.toggle = name => {
     const collection = module.exports.get(name)
 
