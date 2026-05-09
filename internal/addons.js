@@ -33,7 +33,7 @@ module.exports.findOrExit = (addonName, fuzzy) => {
     const addons = module.exports.find(addonName, fuzzy)
 
     if (addons.length === 0) {
-        Logger.log("Found no addons")
+        Logger.error("Found no addons")
         process.exit(4)
     }
 
@@ -97,7 +97,7 @@ const internalInstall = async (path, addon) => {
         await internalInstallList(module.exports.install, Collections.install, dependencies[addon.publishedfileid])
 
     if (existsSync(`${path}/${addon.publishedfileid}.${Game.getAddonExtension()}`)) {
-        Logger.log(`Already downloaded addon: [${addon.publishedfileid}] ${Strings.removeNewlineEnd(addon.title)}`)
+        Logger.error(`Already downloaded addon: [${addon.publishedfileid}] ${Strings.removeNewlineEnd(addon.title)}`)
         return
     }
 
@@ -106,7 +106,7 @@ const internalInstall = async (path, addon) => {
     const vpk = await fetchit(Configuration.getVPKURL(addon.publishedfileid))
 
     if (!vpk.ok) {
-        Logger.log("Error while trying to download addon from server")
+        Logger.error("Error while trying to download addon from server")
         process.exit(5)
     }
 
@@ -115,8 +115,8 @@ const internalInstall = async (path, addon) => {
     const jpg = await fetchit(Configuration.getJPGURL(addon.publishedfileid))
 
     if (!jpg.ok) {
-        Logger.log("Error while trying to download image from server. Was this addon unavailable when added?")
-        Logger.log("The addon should still work, but it might not have an image in the addons menu")
+        Logger.error("Error while trying to download image from server. Was this addon unavailable when added?")
+        Logger.error("The addon should still work, but it might not have an image in the addons menu")
         return
     }
 
@@ -135,7 +135,7 @@ const internalInstall = async (path, addon) => {
         vpkedit = execSync("command -v vpkeditcli").toString()
         vpkedit = vpkedit.substring(0, vpkedit.length - 1)
     } catch {
-        Logger.log("VPKEdit is not installed. Unable to fix addon images")
+        Logger.error("VPKEdit is not installed. Unable to fix addon images")
         return
     }
 
@@ -145,26 +145,26 @@ const internalInstall = async (path, addon) => {
         magick = execSync("command -v magick").toString()
         magick = magick.substring(0, magick.length - 1)
     } catch {
-        Logger.log("ImageMagick is not installed. Unable to fix addon images")
+        Logger.error("ImageMagick is not installed. Unable to fix addon images")
         return
     }
 
     try {
         execSync(`${vpkedit} "${path}/${addon.publishedfileid}.${Game.getAddonExtension()}" -o "${path}" --extract > /dev/null`)
     } catch {
-        Logger.log("Failed to extract addon")
+        Logger.error("Failed to extract addon")
         return
     }
 
     if (!existsSync(`${path}/${addon.publishedfileid}`)) {
-        Logger.log("Addon folder doesn't exist? Was the addon downloaded correctly?")
+        Logger.error("Addon folder doesn't exist? Was the addon downloaded correctly?")
         return
     }
 
     try {
         execSync(`${magick} "${path}/${addon.publishedfileid}.jpg" -strip -sampling-factor 4:2:0 "${path}/${addon.publishedfileid}/addonimage.jpg"`)
     } catch {
-        Logger.log("Failed to fix image")
+        Logger.error("Failed to fix image")
     }
 
     if (!existsSync(`${path}/${addon.publishedfileid}/addoninfo.txt`)) {
@@ -205,7 +205,7 @@ module.exports.download = async addon => {
     const subdirectory = `${process.cwd()}/${addon.title.replaceAll("/", "_")} ${addon.publishedfileid}`
 
     if (existsSync(subdirectory)) {
-        Logger.log(`Already downloaded addon: [${addon.publishedfileid}] ${Strings.removeNewlineEnd(addon.title)}`)
+        Logger.error(`Already downloaded addon: [${addon.publishedfileid}] ${Strings.removeNewlineEnd(addon.title)}`)
         return
     }
 
@@ -258,7 +258,7 @@ const internalInstallList = async (addonFunction, collectionFunction, ids) => {
 
             if (collection != null) {
                 if (ignorelist.includes(id)) {
-                    Logger.log(`Recursion prevented. Collection already installed earlier: ${id}`)
+                    Logger.error(`Recursion prevented. Collection already installed earlier: ${id}`)
                     continue
                 }
 
@@ -271,7 +271,7 @@ const internalInstallList = async (addonFunction, collectionFunction, ids) => {
         const details = module.exports.find(id, false)
 
         if (details.length === 0 || details.length > 1) {
-            Logger.log(`???????????????? ${id}, ${details.length}`)
+            Logger.error(`???????????????? ${id}, ${details.length}`)
             continue
         }
 

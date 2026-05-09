@@ -79,7 +79,7 @@ module.exports.get = name => collections.filter(found => found.name === name)[0]
 
 module.exports.install = async collection => {
     if (collection == null) {
-        Logger.log(`Collection not found`)
+        Logger.error(`Collection not found`)
         return
     }
 
@@ -89,7 +89,7 @@ module.exports.install = async collection => {
 
 module.exports.download = async collection => {
     if (collection == null) {
-        Logger.log(`Collection not found`)
+        Logger.error(`Collection not found`)
         return
     }
 
@@ -140,7 +140,7 @@ module.exports.print = (collection, includeAddons) => {
                 continue
             }
 
-            Logger.log(`RIP: ${addon}`)
+            Logger.error(`RIP: ${addon}`)
             continue
         }
 
@@ -153,7 +153,7 @@ module.exports.toggle = name => {
     const collection = module.exports.get(name)
 
     if (collection == null) {
-        Logger.log(`Collection not found: ${name}`)
+        Logger.error(`Collection not found: ${name}`)
         process.exit(4)
     }
 
@@ -171,7 +171,7 @@ module.exports.toggle = name => {
 
 module.exports.addLocal = (name, addon, override) => {
     if (name === addon) {
-        Logger.log("You cannot add a collection to itself")
+        Logger.error("You cannot add a collection to itself")
         process.exit(7)
     }
 
@@ -188,7 +188,7 @@ module.exports.addLocal = (name, addon, override) => {
 
     if (testCollection != null) {
         if (collection.ids.includes(addon)) {
-            Logger.log("Collection was left unmodified")
+            Logger.error("Collection was left unmodified")
             process.exit(1)
         }
 
@@ -211,7 +211,7 @@ module.exports.addLocal = (name, addon, override) => {
         }
 
         if (added === 0) {
-            Logger.log("Collection was left unmodified")
+            Logger.error("Collection was left unmodified")
             process.exit(1)
         }
     }

@@ -16,7 +16,7 @@ module.exports.initialize = () => {
             break
 
         default:
-            Logger.log(`Invalid game: ${process.argv[2]}`)
+            Logger.error(`Invalid game: ${process.argv[2]}`)
             process.exit(8)
     }
 }

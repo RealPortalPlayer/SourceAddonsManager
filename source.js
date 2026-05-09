@@ -39,12 +39,12 @@ const main = async () => {
     const argument = validArguments[process.argv[3]]
 
     if (argument == null) {
-        Logger.log(`Invalid option: ${process.argv[3]}`)
+        Logger.error(`Invalid option: ${process.argv[3]}`)
         process.exit(1)
     }
 
     if (argument.arguments.filter(found => found.startsWith("<")).length > process.argv.length - 3) {
-        Logger.log("Not enough arguments")
+        Logger.error("Not enough arguments")
         process.exit(2)
     }
 

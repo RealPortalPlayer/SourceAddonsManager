@@ -10,7 +10,7 @@ module.exports = async url => {
         try {
             return await fetch(url)
         } catch {
-            Logger.log(`Failed to download... attempt ${++attempts}`)
+            Logger.error(`Failed to download... attempt ${++attempts}`)
         }
     }
 }

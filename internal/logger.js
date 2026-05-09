@@ -14,3 +14,10 @@ module.exports.debug = message => {
 
     console.log(message)
 }
+
+module.exports.error = message => {
+    if (process.env.SAM_PARSABLE === "1")
+        return
+
+    console.error(message)
+}
