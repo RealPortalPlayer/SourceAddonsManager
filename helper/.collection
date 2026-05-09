@@ -6,6 +6,18 @@ if (process.argv.length <= 2) {
 	process.exit(1)
 }
 
+const fetchit = async (url, data) => {
+    let attempts = 0
+
+    while (true) {
+        try {
+            return await fetch(url, data)
+        } catch {
+            Logger.log(`Failed to download... attempt ${++attempts}`)
+        }
+    }
+}
+
 const body1 = new URLSearchParams()
 const body2 = new URLSearchParams()
 let count = 0
@@ -34,7 +46,7 @@ const awaitHack = async () => {
 
 	console.log("Getting collection addons")
 
-	const response1 = await fetch("https://api.steampowered.com/ISteamRemoteStorage/GetCollectionDetails/v1/", {
+	const response1 = await fetchit("https://api.steampowered.com/ISteamRemoteStorage/GetCollectionDetails/v1/", {
 		method: "POST",
 		headers: {
 			"Content-Type": "application/x-www-form-urlencoded"
@@ -45,7 +57,7 @@ const awaitHack = async () => {
 
 	console.log("Getting collection information")
 
-	const response2 = await fetch("https://api.steampowered.com/ISteamRemoteStorage/GetPublishedFileDetails/v1/", {
+	const response2 = await fetchit("https://api.steampowered.com/ISteamRemoteStorage/GetPublishedFileDetails/v1/", {
 		method: "POST",
 		headers: {
 			"Content-Type": "application/x-www-form-urlencoded"
