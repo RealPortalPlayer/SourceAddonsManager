@@ -126,6 +126,7 @@ module.exports.print = name => {
 
     {
         const collection = getCollection(name)[0]
+        const showEnabledOnly = ArgumentManager.includesArgument("--show_enabled_only")
 
         if (collection != null) {
             let badge = "[P]"
@@ -136,6 +137,9 @@ module.exports.print = name => {
                 badge = "[L]"
             else if (collection.generated)
                 badge = "[G]"
+
+            if (showEnabledOnly && !Collections.getEnabled().includes(collection.name))
+                return
 
             Logger.debug(collection.name)
             Logger.log(`${Collections.getEnabled().includes(collection.name) ? "* " : "  "}${badge} ${collection.name}${includeExtras ? ":" : ""}`)
