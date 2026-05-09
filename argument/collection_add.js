@@ -22,7 +22,7 @@ module.exports = require("../internal/argument")("Add to a local collection", ["
         let installFunction = Addons.install
 
         if (foundAddon == null) {
-            foundAddon = Collections.getEnabled(addon)
+            foundAddon = Collections.get(addon)
             installFunction = Collections.install
 
             if (foundAddon == null) {
