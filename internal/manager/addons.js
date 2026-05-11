@@ -73,11 +73,8 @@ const internalInstall = async (path, addon) => {
 
     const jpg = await fetchit(Configuration.getJPGURL(addon.publishedfileid))
 
-    if (!jpg.ok) {
-        Logger.error("Error while trying to download image from server. Was this addon unavailable when added?")
-        Logger.error("The addon should still work, but it might not have an image in the addons menu")
+    if (!jpg.ok)
         return
-    }
 
     writeFileSync(`${path}/${addon.publishedfileid}.jpg`, await jpg.bytes())
 
