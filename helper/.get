@@ -22,7 +22,7 @@ const fetchit = async (url, data) => {
         try {
             return await fetch(url, data)
         } catch {
-            Logger.log(`Failed to download... attempt ${++attempts}`)
+            console.log(`Failed to download... attempt ${++attempts}`)
         }
     }
 }
