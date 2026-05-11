@@ -98,19 +98,21 @@ const installInternal = async (functionName, name) => {
         }
     }
 
-    const addon = getAddons(name, false)
+    const allowMoreThanOne = ArgumentManager.includesArgument("--allow_more_than_one")
+    const addons = getAddons(name, allowMoreThanOne)
 
-    if (addon.length === 0) {
+    if (addons.length === 0) {
         Logger.error(`Found no addons/collections: ${name}`)
         process.exit(4)
     }
 
-    if (addon.length > 1) {
+    if (!allowMoreThanOne && addons.length > 1) {
         Logger.error("Found more than one addon. Search to narrow it down")
         process.exit(3)
     }
 
-    await callAsyncAddonsFunction(functionName, addon[0])
+    for (const addon of addons)
+        await callAsyncAddonsFunction(functionName, addon)
 }
 
 module.exports.install = async name => {

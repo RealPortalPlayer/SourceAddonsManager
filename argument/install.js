@@ -4,7 +4,7 @@
 const ArgumentManager = require("../internal/argument_manager")
 const Manager = require("../internal/manager")
 
-module.exports = require("../internal/argument")("Install addon", ["<addons>"], async () => {
+module.exports = require("../internal/argument")("Install addon", ["<addons>", "--allow_more_than_one"], async () => {
     for (const addon of ArgumentManager.getAddons())
         await Manager.install(addon)
 })
