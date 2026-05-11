@@ -121,7 +121,7 @@ module.exports.download = async name => {
     await installInternal("download", name)
 }
 
-module.exports.print = name => {
+module.exports.print = (name, fuzzy) => {
     const includeExtras = ArgumentManager.includesArgument("--include_extras")
 
     {
@@ -171,7 +171,7 @@ module.exports.print = name => {
         }
     }
 
-    const addon = getAddons(name, false)[0]
+    const addon = getAddons(name, fuzzy)[0]
 
     if (addon == null) {
         Logger.error(`Found no addons/collections: ${name}`)
