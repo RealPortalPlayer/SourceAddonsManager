@@ -15,6 +15,12 @@ module.exports.initialize = () => {
             addonExtension = "vpk"
             break
 
+        case "l4d":
+            name = "Left 4 Dead"
+            subdirectory = "left4dead"
+            addonExtension = "vpk"
+            break
+
         default:
             Logger.error(`Invalid game: ${process.argv[2]}`)
             process.exit(8)
