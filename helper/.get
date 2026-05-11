@@ -6,6 +6,15 @@ if (process.argv.length <= 2) {
 	process.exit(1)
 }
 
+if (!existsSync("./data.json"))
+    writeFileSync("./data.json", JSON.stringify({
+        "response": {
+            "result": 1,
+            "resultcount": 0,
+            "publishedfiledetails": []
+        }
+    }))
+
 const fetchit = async (url, data) => {
     let attempts = 0
 
