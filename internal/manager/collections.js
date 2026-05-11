@@ -8,6 +8,7 @@ const Logger = require("../logger")
 const fetchit = require("../fetchit")
 const Configuration = require("../configuration")
 const Manager = require("../manager")
+const Game = require("../game")
 
 let collections = null
 let localCollections = null
@@ -17,10 +18,7 @@ module.exports.initialize = async () => {
         mkdirSync(Paths.getConfiguration())
 
     if (!existsSync(Paths.getLocalCollections()))
-        writeFileSync(Paths.getLocalCollections(), JSON.stringify({
-            enabled: [],
-            local: []
-        }))
+        writeFileSync(Paths.getLocalCollections(), JSON.stringify({}))
 
     // FIXME: This sucks, but there isn't really much we can do about it... Too bad.
 
@@ -39,28 +37,35 @@ module.exports.initialize = async () => {
         // intentionally ignored
     }
 
-    collections = []
-    collections.push(...handmadeCollections)
-    collections.push(...generatedCollections)
+    collections = {}
+    collections[Game.getName()] = []
+    collections[Game.getName()].push(...handmadeCollections)
+    collections[Game.getName()].push(...generatedCollections)
 
     localCollections = require(Paths.getLocalCollections())
 
-    for (const collection of localCollections.local) {
+    if (localCollections[Game.getName()] == null)
+        localCollections[Game.getName()] = {
+            "enabled": [],
+            "local": []
+        }
+
+    for (const collection of localCollections[Game.getName()].local) {
         const oldCollection = module.exports.get(collection.name)[0]
 
         if (oldCollection == null) {
             collection.local = true
 
-            collections.push(collection)
+            collections[Game.getName()].push(collection)
             continue
         }
 
         if (collection.override) {
-            collections = collections.filter(found => found.name !== collection.name)
+            collections = collections[Game.getName()].filter(found => found.name !== collection.name)
 
             oldCollection.local = true
 
-            collections.push(collection)
+            collections[Game.getName()].push(collection)
             continue
         }
 
@@ -75,14 +80,14 @@ module.exports.initialize = async () => {
     }
 }
 
-module.exports.get = name => collections.filter(found => found.name === name)
+module.exports.get = name => collections[Game.getName()].filter(found => found.name === name)
 
-module.exports.getAll = () => collections
+module.exports.getAll = () => collections[Game.getName()]
 
 module.exports.getEnabled = () => {
     let array = []
 
-    for (const collection of localCollections.enabled)
+    for (const collection of localCollections[Game.getName()].enabled)
         array.push(module.exports.get(collection)[0].name)
 
     return array
@@ -96,13 +101,13 @@ module.exports.toggle = name => {
         process.exit(4)
     }
 
-    if (!localCollections.enabled.includes(name)) {
+    if (!localCollections[Game.getName()].enabled.includes(name)) {
         Logger.log(`Enabling: ${name}`)
-        localCollections.enabled.push(name)
+        localCollections[Game.getName()].enabled.push(name)
     } else {
         Logger.log(`Disabling: ${name}`)
 
-        localCollections.enabled = localCollections.enabled.filter(collection => collection !== name)
+        localCollections[Game.getName()].enabled = localCollections[Game.getName()].enabled.filter(collection => collection !== name)
     }
 
     writeFileSync(Paths.getLocalCollections(), JSON.stringify(localCollections))
@@ -114,7 +119,7 @@ module.exports.addLocal = (name, addon, override) => {
         process.exit(7)
     }
 
-    let collection = localCollections.local.find(found => found.name === name)
+    let collection = localCollections[Game.getName()].local.find(found => found.name === name)
 
     if (collection == null)
         collection = {
@@ -155,8 +160,8 @@ module.exports.addLocal = (name, addon, override) => {
         }
     }
 
-    localCollections.local = localCollections.local.filter(found => found.name !== name)
+    localCollections[Game.getName()].local = localCollections[Game.getName()].local.filter(found => found.name !== name)
 
-    localCollections.local.push(collection)
+    localCollections[Game.getName()].local.push(collection)
     writeFileSync(Paths.getLocalCollections(), JSON.stringify(localCollections))
 }
