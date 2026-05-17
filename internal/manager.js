@@ -173,34 +173,39 @@ module.exports.print = (name, fuzzy) => {
         }
     }
 
-    const addon = getAddons(name, fuzzy)[0]
+    let printedOne = false
 
-    if (addon == null) {
-        Logger.error(`Found no addons/collections: ${name}`)
-        process.exit(4)
+    for (const addon of getAddons(name, fuzzy)) {
+        printedOne = true
+
+        if (process.env.SAM_PARSABLE === "1") {
+            Logger.debug(addon.publishedfileid)
+            return
+        }
+
+        let finalString = ""
+
+        if (includeExtras)
+            finalString += "\n============================================ "
+
+        finalString += `[${addon.publishedfileid}] `
+
+        if (includeExtras)
+            finalString += "Addon: "
+
+        finalString += Strings.removeNewlineEnd(addon.title)
+
+        if (includeExtras)
+            finalString += `\n${Strings.removeNewlineEnd(addon.description)}`
+
+        Logger.log(finalString)
     }
 
-    if (process.env.SAM_PARSABLE === "1") {
-        Logger.debug(addon.publishedfileid)
-        return
-    }
+    if (printedOne)
+        return;
 
-    let finalString = ""
-
-    if (includeExtras)
-        finalString += "\n============================================ "
-
-    finalString += `[${addon.publishedfileid}] `
-
-    if (includeExtras)
-        finalString += "Addon: "
-
-    finalString += Strings.removeNewlineEnd(addon.title)
-
-    if (includeExtras)
-        finalString += `\n${Strings.removeNewlineEnd(addon.description)}`
-
-    Logger.log(finalString)
+    Logger.error(`Found no addons/collections: ${name}`)
+    process.exit(4)
 }
 
 module.exports.addToLocalCollection = (name, addonName, override) => {
