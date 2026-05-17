@@ -193,7 +193,7 @@ module.exports.print = (name, fuzzy) => {
         for (const tag of addon.tags)
             tags += `${tag.tag}, `
 
-        finalString += `[${addon.publishedfileid}, ${tags.substring(0, tags.length - 2)}] `
+        finalString += `[${addon.publishedfileid}${includeExtras ? `, ${tags.substring(0, tags.length - 2)}` : ""}] `
 
         if (includeExtras)
             finalString += "Addon: "
