@@ -5,7 +5,7 @@ const Addons = require("./manager/addons")
 const Collections = require("./manager/collections")
 const Logger = require("./logger")
 const ArgumentManager = require("./argument_manager")
-const Strings = require("./strings");
+const Strings = require("./strings")
 
 let objectNamesToObjects = {
     "Collections": Collections,
@@ -188,7 +188,12 @@ module.exports.print = (name, fuzzy) => {
         if (includeExtras)
             finalString += "\n============================================ "
 
-        finalString += `[${addon.publishedfileid}] `
+        let tags = ""
+
+        for (const tag of addon.tags)
+            tags += `${tag.tag}, `
+
+        finalString += `[${addon.publishedfileid}, ${tags.substring(0, tags.length - 2)}] `
 
         if (includeExtras)
             finalString += "Addon: "
@@ -202,7 +207,7 @@ module.exports.print = (name, fuzzy) => {
     }
 
     if (printedOne)
-        return;
+        return
 
     Logger.error(`Found no addons/collections: ${name}`)
     process.exit(4)
