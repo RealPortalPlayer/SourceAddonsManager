@@ -21,7 +21,7 @@ const main = async () => {
     }
 
     if (process.argv.length <= 3) {
-        Logger.log(`${basename(process.argv[1])} <game> <operation> [--parsable] [...]`)
+        Logger.log(`${basename(process.argv[1])} <game> <operation> [--parsable] [--dry] [...]`)
 
         for (const argument in validArguments) {
             const value = validArguments[argument]

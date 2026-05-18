@@ -1,7 +1,7 @@
 // Purpose: Uninstall addons
 // Created on: 5/1/26 @ 2:59 AM
 
-const {rmSync, mkdirSync, readdirSync, unlinkSync, existsSync} = require("fs")
+const {readdirSync, existsSync} = require("fs")
 
 const Paths = require("../internal/paths")
 const Logger = require("../internal/logger")
@@ -9,14 +9,15 @@ const Strings = require("../internal/strings")
 const Game = require("../internal/game")
 const ArgumentManager = require("../internal/argument_manager")
 const Manager = require("../internal/manager")
+const FilesystemWrapper = require("../internal/filesystem_wrapper")
 
 module.exports = require("../internal/argument")("Uninstall addon", ["<addons/--all>"], async () => {
     if (ArgumentManager.includesArgument("--all")) {
         Logger.log("Uninstalling all addons")
-        rmSync(`${Paths.getSteamApplications()}/common/${Game.getName()}/${Game.getSubdirectory()}/addons`, {
+        FilesystemWrapper.rm(`${Paths.getSteamApplications()}/common/${Game.getName()}/${Game.getSubdirectory()}/addons`, {
             recursive: true
         })
-        mkdirSync(`${Paths.getSteamApplications()}/common/${Game.getName()}/${Game.getSubdirectory()}/addons`)
+        FilesystemWrapper.mkdir(`${Paths.getSteamApplications()}/common/${Game.getName()}/${Game.getSubdirectory()}/addons`)
 
         for (const collection of Manager.getEnabledCollections())
             await Manager.install(collection)
@@ -37,7 +38,7 @@ module.exports = require("../internal/argument")("Uninstall addon", ["<addons/--
                 if (!existsSync(path))
                     return
 
-                rmSync(path, {
+                FilesystemWrapper.rm(path, {
                     recursive
                 })
             }
@@ -86,7 +87,7 @@ module.exports = require("../internal/argument")("Uninstall addon", ["<addons/--
                     logged.push(addon.publishedfileid)
                 }
 
-                unlinkSync(`${Paths.getSteamApplications()}/common/${Game.getName()}/${Game.getSubdirectory()}/addons/${file}`)
+                FilesystemWrapper.unlink(`${Paths.getSteamApplications()}/common/${Game.getName()}/${Game.getSubdirectory()}/addons/${file}`)
             }
         }
     }

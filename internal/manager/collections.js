@@ -1,7 +1,7 @@
 // Purpose: Collection management
 // Created on: 5/1/26 @ 3:03 AM
 
-const {existsSync, mkdirSync, writeFileSync} = require("fs")
+const {existsSync} = require("fs")
 
 const Paths = require("../paths")
 const Logger = require("../logger")
@@ -9,16 +9,17 @@ const fetchit = require("../fetchit")
 const Configuration = require("../configuration")
 const Manager = require("../manager")
 const Game = require("../game")
+const FilesystemWrapper = require("../filesystem_wrapper")
 
 let collections = null
 let localCollections = null
 
 module.exports.initialize = async () => {
     if (!existsSync(Paths.getConfiguration()))
-        mkdirSync(Paths.getConfiguration())
+        FilesystemWrapper.mkdir(Paths.getConfiguration())
 
     if (!existsSync(Paths.getLocalCollections()))
-        writeFileSync(Paths.getLocalCollections(), JSON.stringify({}))
+        FilesystemWrapper.writeFile(Paths.getLocalCollections(), JSON.stringify({}))
 
     // FIXME: This sucks, but there isn't really much we can do about it... Too bad.
 
@@ -110,7 +111,7 @@ module.exports.toggle = name => {
         localCollections[Game.getName()].enabled = localCollections[Game.getName()].enabled.filter(collection => collection !== name)
     }
 
-    writeFileSync(Paths.getLocalCollections(), JSON.stringify(localCollections))
+    FilesystemWrapper.writeFile(Paths.getLocalCollections(), JSON.stringify(localCollections))
 }
 
 module.exports.addLocal = (name, addon, override) => {
@@ -163,5 +164,5 @@ module.exports.addLocal = (name, addon, override) => {
     localCollections[Game.getName()].local = localCollections[Game.getName()].local.filter(found => found.name !== name)
 
     localCollections[Game.getName()].local.push(collection)
-    writeFileSync(Paths.getLocalCollections(), JSON.stringify(localCollections))
+    FilesystemWrapper.writeFile(Paths.getLocalCollections(), JSON.stringify(localCollections))
 }
