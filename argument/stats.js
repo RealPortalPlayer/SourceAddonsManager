@@ -16,6 +16,7 @@ module.exports = require("../internal/argument")("Show stats", [], () => {
     }
 
     Logger.debug(Manager.getAllAddons().length)
+    Logger.debug(dead)
     Logger.debug(Manager.getAllCollections().length)
     Logger.log(`Addons: ${addons.length} (${dead} of which were deleted off the Workshop)`)
     Logger.log(`Collections: ${Manager.getEnabledCollections().length}/${Manager.getAllCollections().length}`)
