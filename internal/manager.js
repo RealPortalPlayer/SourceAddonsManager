@@ -125,6 +125,7 @@ module.exports.download = async name => {
 
 module.exports.print = (name, fuzzy) => {
     const includeExtras = ArgumentManager.includesArgument("--include_extras")
+    let printedOne = false
 
     {
         const collection = getCollection(name)[0]
@@ -146,34 +147,33 @@ module.exports.print = (name, fuzzy) => {
             Logger.debug(collection.name)
             Logger.log(`${Collections.getEnabled().includes(collection.name) ? "* " : "  "}${badge} ${collection.name}${includeExtras ? ":" : ""}`)
 
-            if (!includeExtras)
-                return
+            if (includeExtras) {
+                for (const addon of collection.ids) {
+                    const foundAddon = getAddons(addon, false)[0]
 
-            for (const addon of collection.ids) {
-                const foundAddon = getAddons(addon, false)[0]
+                    if (foundAddon == null) {
+                        const testCollection = Collections.get(addon)
 
-                if (foundAddon == null) {
-                    const testCollection = Collections.get(addon)
+                        printedOne = true
 
-                    if (testCollection != null) {
-                        Logger.debug(addon)
-                        Logger.log(`[COLLECTION] ${addon}`)
+                        if (testCollection != null) {
+                            Logger.debug(addon)
+                            Logger.log(`[COLLECTION] ${addon}`)
+                            continue
+                        }
+
+                        Logger.error(`RIP: ${addon}`)
                         continue
                     }
 
-                    Logger.error(`RIP: ${addon}`)
-                    continue
+                    printedOne = true
+
+                    Logger.debug(foundAddon)
+                    Logger.log(`[${foundAddon.publishedfileid}] ${Strings.removeNewlineEnd(foundAddon.title)}`)
                 }
-
-                Logger.debug(foundAddon)
-                Logger.log(`[${foundAddon.publishedfileid}] ${Strings.removeNewlineEnd(foundAddon.title)}`)
             }
-
-            return
         }
     }
-
-    let printedOne = false
 
     for (const addon of getAddons(name, fuzzy)) {
         printedOne = true
