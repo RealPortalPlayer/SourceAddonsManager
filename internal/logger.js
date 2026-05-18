@@ -1,22 +1,26 @@
 // Purpose: Logging
 // Created on: 5/1/26 @ 2:48 PM
 
+const ArgumentManager = require("./argument_manager")
+
+const parsable = ArgumentManager.includesArgument("--parsable")
+
 module.exports.log = message => {
-    if (process.env.SAM_PARSABLE === "1")
+    if (parsable)
         return
 
     console.log(message)
 }
 
 module.exports.debug = message => {
-    if (process.env.SAM_PARSABLE !== "1")
+    if (!parsable)
         return
 
     console.log(message)
 }
 
 module.exports.error = message => {
-    if (process.env.SAM_PARSABLE === "1")
+    if (parsable)
         return
 
     console.error(message)
