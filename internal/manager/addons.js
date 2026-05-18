@@ -10,6 +10,7 @@ const Logger = require("../logger")
 const fetchit = require("../fetchit")
 const Game = require("../game")
 const Configuration = require("../configuration")
+const Manager = require("../manager")
 
 let mods = null
 let dependencies = null
@@ -52,9 +53,6 @@ module.exports.get = (addonName, fuzzy) => {
 }
 
 const internalInstall = async (path, addon) => {
-    // if (dependencies[addon.publishedfileid] != null)
-    //     await internalInstallList(module.exports.install, Collections.install, dependencies[addon.publishedfileid])
-
     if (existsSync(`${path}/${addon.publishedfileid}.${Game.getAddonExtension()}`)) {
         Logger.error(`Already downloaded addon: [${addon.publishedfileid}] ${Strings.removeNewlineEnd(addon.title)}`)
         return
@@ -154,7 +152,37 @@ const internalInstall = async (path, addon) => {
 }
 
 module.exports.install = async addon => {
-    await internalInstall( `${Paths.getSteamApplications()}/common/${Game.getName()}/${Game.getSubdirectory()}/addons`, addon)
+    const path = `${Paths.getSteamApplications()}/common/${Game.getName()}/${Game.getSubdirectory()}/addons`
+
+    {
+        let installed = false
+        let toInstall = []
+
+        if (dependencies.specific[addon.publishedfileid] != null) {
+            toInstall = dependencies.specific[addon.publishedfileid]
+
+            toInstall.push(addon.publishedfileid)
+        } else {
+            for (const dependency of dependencies.generic) {
+                if (!dependency.includes(addon.publishedfileid))
+                    continue
+
+                toInstall = dependency
+                break
+            }
+        }
+
+        for (const found of toInstall) {
+            installed = true
+
+            await internalInstall(path, module.exports.get(found, false)[0])
+        }
+
+        if (installed)
+            return
+    }
+
+    await internalInstall(path, addon)
 }
 
 module.exports.download = async addon => {
