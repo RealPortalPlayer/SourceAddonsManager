@@ -7,5 +7,5 @@ const Logger = require("../internal/logger")
 
 module.exports = require("../internal/argument")("Search addons", ["<addons>"], () => {
     for (const addon of ArgumentManager.getAddons())
-        Manager.print(addon, true)
+        Manager.printBoth(addon, true)
 })

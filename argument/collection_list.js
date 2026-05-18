@@ -7,5 +7,5 @@ const Manager = require("../internal/manager")
 
 module.exports = require("../internal/argument")("List collections", ["[--include_extras]", "[--show_enabled_only]"], () => {
     for (const collection of Manager.getAllCollections())
-        Manager.print(collection.name, false)
+        Manager.printCollection(collection.name)
 })

@@ -22,6 +22,6 @@ module.exports = require("../internal/argument")("Tell what addons you got insta
             id = addon.substring(0, addon.length - 4)
         }
 
-        Manager.print(id, false)
+        Manager.printAddons(id, false)
     }
 })

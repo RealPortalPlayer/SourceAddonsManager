@@ -5,5 +5,5 @@ const Manager = require("../internal/manager")
 
 module.exports = require("../internal/argument")("List all addons", ["[--include_extras]"], () => {
     for (const addon of Manager.getAllAddons())
-        Manager.print(addon.title, false)
+        Manager.printAddons(addon.title, false)
 })

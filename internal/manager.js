@@ -123,94 +123,82 @@ module.exports.download = async name => {
     await installInternal("download", name)
 }
 
-module.exports.print = (name, fuzzy) => {
+{
     const includeExtras = ArgumentManager.includesArgument("--include_extras")
-    let printedOne = false
 
-    {
+    module.exports.printCollection = name => {
         const collection = getCollection(name)[0]
         const showEnabledOnly = ArgumentManager.includesArgument("--show_enabled_only")
 
-        if (collection != null) {
-            let badge = "[P]"
-
-            if (collection.modified)
-                badge = "[M]"
-            else if (collection.local)
-                badge = "[L]"
-            else if (collection.generated)
-                badge = "[G]"
-
-            if (showEnabledOnly && !Collections.getEnabled().includes(collection.name))
-                return
-
-            Logger.debug(collection.name)
-            Logger.log(`${Collections.getEnabled().includes(collection.name) ? "* " : "  "}${badge} ${collection.name}${includeExtras ? ":" : ""}`)
-
-            if (includeExtras) {
-                for (const addon of collection.ids) {
-                    const foundAddon = getAddons(addon, false)[0]
-
-                    if (foundAddon == null) {
-                        const testCollection = Collections.get(addon)
-
-                        printedOne = true
-
-                        if (testCollection != null) {
-                            Logger.debug(addon)
-                            Logger.log(`[COLLECTION] ${addon}`)
-                            continue
-                        }
-
-                        Logger.error(`RIP: ${addon}`)
-                        continue
-                    }
-
-                    printedOne = true
-
-                    Logger.debug(foundAddon)
-                    Logger.log(`[${foundAddon.publishedfileid}] ${Strings.removeNewlineEnd(foundAddon.title)}`)
-                }
-            }
-        }
-    }
-
-    for (const addon of getAddons(name, fuzzy)) {
-        printedOne = true
-
-        if (process.env.SAM_PARSABLE === "1") {
-            Logger.debug(addon.publishedfileid)
+        if (collection == null)
             return
-        }
 
-        let finalString = ""
+        let badge = "[P]"
 
-        if (includeExtras)
-            finalString += "\n============================================ "
+        if (collection.modified)
+            badge = "[M]"
+        else if (collection.local)
+            badge = "[L]"
+        else if (collection.generated)
+            badge = "[G]"
 
-        let tags = ""
+        if (showEnabledOnly && !Collections.getEnabled().includes(collection.name))
+            return
 
-        for (const tag of addon.tags)
-            tags += `${tag.tag}, `
+        Logger.debug(collection.name)
+        Logger.log(`${Collections.getEnabled().includes(collection.name) ? "* " : "  "}${badge} ${collection.name}${includeExtras ? ":" : ""}`)
 
-        finalString += `[${addon.publishedfileid}${includeExtras ? `, ${tags.substring(0, tags.length - 2)}` : ""}] `
+        if (!includeExtras)
+            return
 
-        if (includeExtras)
-            finalString += "Addon: "
-
-        finalString += Strings.removeNewlineEnd(addon.title)
-
-        if (includeExtras)
-            finalString += `\n${Strings.removeNewlineEnd(addon.description)}`
-
-        Logger.log(finalString)
+        module.exports.printAddons(name, false)
     }
 
-    if (printedOne)
-        return
+    module.exports.printAddons = (name, fuzzy) => {
+        let printedOne = false
 
-    Logger.error(`Found no addons/collections: ${name}`)
-    process.exit(4)
+        for (const addon of getAddons(name, fuzzy)) {
+            printedOne = true
+
+            if (Logger.isParsableEnabled()) {
+                Logger.debug(addon.publishedfileid)
+                continue
+            }
+
+            let finalString = ""
+
+            if (includeExtras)
+                finalString += "\n============================================ "
+
+            let tags = ""
+
+            for (const tag of addon.tags)
+                tags += `${tag.tag}, `
+
+            finalString += `[${addon.publishedfileid}${includeExtras ? `, ${tags.substring(0, tags.length - 2)}` : ""}] `
+
+            if (includeExtras)
+                finalString += "Addon: "
+
+            finalString += Strings.removeNewlineEnd(addon.title)
+
+            if (includeExtras)
+                finalString += `\n${Strings.removeNewlineEnd(addon.description)}`
+
+            Logger.log(finalString)
+        }
+
+        if (printedOne)
+            return
+
+        Logger.error(`Found no addons/collections: ${name}`)
+        process.exit(4)
+    }
+}
+
+module.exports.printBoth = (name, fuzzy) => {
+    module.exports.printCollection(name)
+    module.exports.printAddons(name, fuzzy)
 }
 
 module.exports.addToLocalCollection = (name, addonName, override) => {

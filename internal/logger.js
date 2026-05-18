@@ -5,6 +5,8 @@ const ArgumentManager = require("./argument_manager")
 
 const parsable = ArgumentManager.includesArgument("--parsable")
 
+module.exports.isParsableEnabled = () => parsable
+
 module.exports.log = message => {
     if (parsable)
         return
