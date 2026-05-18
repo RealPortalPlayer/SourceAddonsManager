@@ -29,7 +29,7 @@ module.exports = require("../internal/argument")("Add to a local collection", ["
             process.exit(4)
         }
 
-        Manager.addToLocalCollection(collectionName, found.title ?? found.name, override)
+        Manager.addToLocalCollection(collectionName, found.publishedfileid ?? found.name, override)
 
         if (!Manager.getEnabledCollections().includes(collectionName))
             continue
