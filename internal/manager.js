@@ -208,3 +208,14 @@ module.exports.addToLocalCollection = (name, addonName, override) => {
 module.exports.toggleCollection = name => {
     callCollectionsFunction("toggle", name)
 }
+
+module.exports.blacklistAddon = name => {
+    const addon = getAddons(name, false)[0]
+
+    if (addon == null) {
+        Logger.error(`Found no addons: ${name}`)
+        process.exit(4)
+    }
+
+    Addons.blacklist(addon)
+}

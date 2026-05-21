@@ -15,6 +15,10 @@ module.exports.getLocalCollections = () => {
     return `${module.exports.getConfiguration()}/collections.json`
 }
 
+module.exports.getBlacklist = () => {
+    return `${module.exports.getConfiguration()}/blacklist.json`
+}
+
 module.exports.getSteamApplications = () => {
     // TODO: This could be changed
     switch (platform()) {

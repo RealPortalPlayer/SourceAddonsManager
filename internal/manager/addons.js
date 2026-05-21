@@ -14,11 +14,13 @@ const FilesystemWrapper = require("../filesystem_wrapper")
 
 let mods = null
 let dependencies = null
+let blacklist = null
 
 module.exports.initialize = async () => {
     // FIXME: This sucks, but there isn't really much we can do about it... Too bad.
     mods = await (await fetchit(Configuration.getDataURL())).json()
     dependencies = []
+    blacklist = []
 
     for (const addon of mods.response.publishedfiledetails) {
         if (addon.result === 1)
@@ -31,6 +33,15 @@ module.exports.initialize = async () => {
 
     try {
         dependencies = await (await fetchit(Configuration.getAddonsDependenciesURL())).json()
+    } catch {
+        // intentionally ignored
+    }
+
+    if (!existsSync(Paths.getBlacklist()))
+        FilesystemWrapper.writeFile(Paths.getBlacklist(), JSON.stringify([]))
+
+    try {
+        blacklist = require(Paths.getBlacklist())
     } catch {
         // intentionally ignored
     }
@@ -55,6 +66,11 @@ module.exports.get = (addonName, fuzzy) => {
 const internalInstall = async (path, addon) => {
     if (existsSync(`${path}/${addon.publishedfileid}.${Game.getAddonExtension()}`)) {
         Logger.error(`Already downloaded addon: [${addon.publishedfileid}] ${Strings.removeNewlineEnd(addon.title)}`)
+        return
+    }
+
+    if (blacklist.includes(addon.publishedfileid)) {
+        Logger.log(`Ignoring blacklisted ID: ${addon.publishedfileid}`)
         return
     }
 
@@ -202,4 +218,15 @@ module.exports.download = async addon => {
     FilesystemWrapper.rm(`${Paths.getConfiguration()}/${addon.publishedfileid}`, {
         recursive: true
     })
+}
+
+module.exports.blacklist = addon => {
+    if (blacklist.includes(addon.publishedfileid)) {
+        Logger.log(`Addon is already blacklisted: [${addon.publishedfileid}] ${Strings.removeNewlineEnd(addon.title)}`)
+        return
+    }
+
+    Logger.log(`Blacklisting: [${addon.publishedfileid}] ${Strings.removeNewlineEnd(addon.title)}`)
+    blacklist.push(addon.publishedfileid)
+    FilesystemWrapper.writeFile(Paths.getBlacklist(), JSON.stringify(blacklist))
 }
