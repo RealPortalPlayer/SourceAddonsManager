@@ -172,8 +172,10 @@ module.exports.download = async name => {
 
             let tags = ""
 
-            for (const tag of addon.tags)
-                tags += `${tag.tag}, `
+            if (addon.tags != null) {
+                for (const tag of addon.tags)
+                    tags += `${tag.tag}, `
+            }
 
             finalString += `[${addon.publishedfileid}${includeExtras ? `, ${tags.substring(0, tags.length - 2)}` : ""}] `
 
