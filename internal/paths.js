@@ -2,6 +2,7 @@
 // Created on: 5/1/26 @ 8:13 AM
 
 const {userInfo, platform} = require("os")
+const configuration = require("../configuration.json")
 
 module.exports.getConfiguration = () => {
     switch (platform()) {
@@ -20,6 +21,9 @@ module.exports.getBlacklist = () => {
 }
 
 module.exports.getSteamApplications = () => {
+    if (configuration.custom_steamapps_path != null)
+        return configuration.custom_steamapps_path
+
     // TODO: This could be changed
     switch (platform()) {
         case "linux": case "freebsd": case "openbsd": return `${userInfo().homedir}/.local/share/Steam/steamapps`
