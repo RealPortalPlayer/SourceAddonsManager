@@ -52,11 +52,11 @@ module.exports.getAll = () => mods.response.publishedfiledetails
 module.exports.get = (addonName, fuzzy) => {
     addonName = addonName.toLowerCase()
 
-    let checkTitle = title => title.toLowerCase().includes(addonName)
+    let checkTitle = title => title != null && title.toLowerCase().includes(addonName)
     let checkDescription = description => checkTitle(description)
 
     if (!fuzzy) {
-        checkTitle = title => title.toLowerCase() === addonName
+        checkTitle = title => title != null && title.toLowerCase() === addonName
         checkDescription = _ => false
     }
 
