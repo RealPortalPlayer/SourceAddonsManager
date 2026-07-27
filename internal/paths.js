@@ -2,6 +2,7 @@
 // Created on: 5/1/26 @ 8:13 AM
 
 const {userInfo, platform} = require("os")
+
 const configuration = require("../configuration.json")
 
 module.exports.getConfiguration = () => {
@@ -32,3 +33,5 @@ module.exports.getSteamApplications = () => {
         case "win32": return "C:\\Program Files (x86)\\Steam\\steamapps"
     }
 }
+
+module.exports.getSteamCommon = () => `${module.exports.getSteamApplications()}${platform() === "win32" ? "\\" : "/"}${configuration.custom_steamapps_common_name ?? "common"}`

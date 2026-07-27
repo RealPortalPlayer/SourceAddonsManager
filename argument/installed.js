@@ -8,12 +8,12 @@ const Game = require("../internal/game")
 const Manager = require("../internal/manager")
 
 module.exports = require("../internal/argument")("Tell what addons you got installed", [], () => {
-    const addons = readdirSync(`${Paths.getSteamApplications()}/common/${Game.getName()}/${Game.getSubdirectory()}/addons`)
+    const addons = readdirSync(`${Paths.getSteamCommon()}/${Game.getName()}/${Game.getSubdirectory()}/addons`)
 
     for (const addon of addons) {
         let id = ""
 
-        if (statSync(`${Paths.getSteamApplications()}/common/${Game.getName()}/${Game.getSubdirectory()}/addons/${addon}`).isDirectory())
+        if (statSync(`${Paths.getSteamCommon()}/${Game.getName()}/${Game.getSubdirectory()}/addons/${addon}`).isDirectory())
             id = addon
         else {
             if (addon.endsWith(".jpg") || !addon.endsWith(`.${Game.getAddonExtension()}`))

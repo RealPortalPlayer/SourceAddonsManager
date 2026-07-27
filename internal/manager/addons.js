@@ -168,7 +168,7 @@ const internalInstall = async (path, addon) => {
 }
 
 module.exports.install = async addon => {
-    const path = `${Paths.getSteamApplications()}/common/${Game.getName()}/${Game.getSubdirectory()}/addons`
+    const path = `${Paths.getSteamCommon()}/${Game.getName()}/${Game.getSubdirectory()}/addons`
 
     {
         let installed = false

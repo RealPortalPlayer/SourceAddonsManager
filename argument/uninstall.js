@@ -14,10 +14,10 @@ const FilesystemWrapper = require("../internal/filesystem_wrapper")
 module.exports = require("../internal/argument")("Uninstall addon", ["<addons/--all>"], async () => {
     if (ArgumentManager.includesArgument("--all")) {
         Logger.log("Uninstalling all addons")
-        FilesystemWrapper.rm(`${Paths.getSteamApplications()}/common/${Game.getName()}/${Game.getSubdirectory()}/addons`, {
+        FilesystemWrapper.rm(`${Paths.getSteamCommon()}/${Game.getName()}/${Game.getSubdirectory()}/addons`, {
             recursive: true
         })
-        FilesystemWrapper.mkdir(`${Paths.getSteamApplications()}/common/${Game.getName()}/${Game.getSubdirectory()}/addons`)
+        FilesystemWrapper.mkdir(`${Paths.getSteamCommon()}/${Game.getName()}/${Game.getSubdirectory()}/addons`)
 
         for (const collection of Manager.getEnabledCollections())
             await Manager.install(collection)
@@ -61,9 +61,9 @@ module.exports = require("../internal/argument")("Uninstall addon", ["<addons/--
                         Logger.debug(loggingAddon.publishedfileid)
                     }
 
-                    deletePathIfExists(`${Paths.getSteamApplications()}/common/${Game.getName()}/${Game.getSubdirectory()}/addons/${addon}`, true)
-                    deletePathIfExists(`${Paths.getSteamApplications()}/common/${Game.getName()}/${Game.getSubdirectory()}/addons/${addon}.${Game.getAddonExtension()}`, false)
-                    deletePathIfExists(`${Paths.getSteamApplications()}/common/${Game.getName()}/${Game.getSubdirectory()}/addons/${addon}.jpg`, false)
+                    deletePathIfExists(`${Paths.getSteamCommon()}/${Game.getName()}/${Game.getSubdirectory()}/addons/${addon}`, true)
+                    deletePathIfExists(`${Paths.getSteamCommon()}/${Game.getName()}/${Game.getSubdirectory()}/addons/${addon}.${Game.getAddonExtension()}`, false)
+                    deletePathIfExists(`${Paths.getSteamCommon()}/${Game.getName()}/${Game.getSubdirectory()}/addons/${addon}.jpg`, false)
                 }
             }
 
@@ -71,7 +71,7 @@ module.exports = require("../internal/argument")("Uninstall addon", ["<addons/--
             continue
         }
 
-        for (const file of readdirSync(`${Paths.getSteamApplications()}/common/${Game.getName()}/${Game.getSubdirectory()}/addons`)) {
+        for (const file of readdirSync(`${Paths.getSteamCommon()}/${Game.getName()}/${Game.getSubdirectory()}/addons`)) {
             if (!file.endsWith(`.${Game.getAddonExtension()}`))
                 continue
 
@@ -87,7 +87,7 @@ module.exports = require("../internal/argument")("Uninstall addon", ["<addons/--
                     logged.push(addon.publishedfileid)
                 }
 
-                FilesystemWrapper.unlink(`${Paths.getSteamApplications()}/common/${Game.getName()}/${Game.getSubdirectory()}/addons/${file}`)
+                FilesystemWrapper.unlink(`${Paths.getSteamCommon()}/${Game.getName()}/${Game.getSubdirectory()}/addons/${file}`)
             }
         }
     }

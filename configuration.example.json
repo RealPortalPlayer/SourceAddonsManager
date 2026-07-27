@@ -6,5 +6,6 @@
     "handmade_collections": "/Mods/$1/collections.json",
     "generated_collections": "/Mods/$1/generated_collections.json",
     "addons_dependencies": "/Mods/$1/dependencies.json",
-    "custom_steamapps_path": null
+    "custom_steamapps_path": null,
+    "custom_steamapps_common_name": null
 }
