@@ -60,7 +60,7 @@ module.exports.get = (addonName, fuzzy) => {
         checkDescription = _ => false
     }
 
-    return mods.response.publishedfiledetails.filter(addon => addon.publishedfileid === addonName || checkTitle(addon.title) || checkDescription(addon.description) || (fuzzy && addon.tags.filter(tag => tag.tag.toLowerCase().includes(addonName)).length !== 0))
+    return mods.response.publishedfiledetails.filter(addon => addon.publishedfileid === addonName || checkTitle(addon.title) || checkDescription(addon.description) || (fuzzy && (addon.tags ?? []).filter(tag => tag.tag.toLowerCase().includes(addonName)).length !== 0))
 }
 
 const internalInstall = async (path, addon) => {
