@@ -2,13 +2,18 @@
 // Created on: 4/29/26 @ 11:10 PM
 
 const {basename} = require("path")
-const {readdirSync} = require("fs")
+const {readdirSync, existsSync} = require("fs")
 
 const Logger = require("./internal/logger")
 const Game = require("./internal/game")
 const Manager = require("./internal/manager")
+const Paths = require("./internal/paths");
+const FilesystemWrapper = require("./internal/filesystem_wrapper")
 
 const main = async () => {
+    if (!existsSync(Paths.getConfiguration()))
+        FilesystemWrapper.mkdir(Paths.getConfiguration())
+
     const validArguments = {}
 
     for (const argument of readdirSync(`${__dirname}/argument`)) {

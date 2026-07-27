@@ -15,9 +15,6 @@ let collections = null
 let localCollections = null
 
 module.exports.initialize = async () => {
-    if (!existsSync(Paths.getConfiguration()))
-        FilesystemWrapper.mkdir(Paths.getConfiguration())
-
     if (!existsSync(Paths.getLocalCollections()))
         FilesystemWrapper.writeFile(Paths.getLocalCollections(), JSON.stringify({}))
 
