@@ -23,7 +23,8 @@ if (!existsSync("./generated_collections.json"))
 process.argv.shift()
 process.argv.shift()
 
-let {body, count} = getData(process.argv.filter(item => !existsSync(`./${item}.vpk`)))
+const ids = process.argv.filter(item => !existsSync(`./${item}.vpk`))
+let {count} = getData(ids)
 
 const awaitHack = async () => {
 	if (count === 0) {
@@ -35,7 +36,7 @@ const awaitHack = async () => {
 
 	let data = require("./data.json")
 
-	const result = await getAddonInformation(body)
+	const result = await getAddonInformation(ids)
 	let looped = 0
 	let downloaded = 0
 

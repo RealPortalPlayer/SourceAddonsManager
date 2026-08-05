@@ -15,6 +15,8 @@ const fetchit = async (url, data) => {
     }
 }
 
+const sleep = ms => new Promise(resolve => setTimeout(resolve, ms))
+
 module.exports.getData = array => {
     let body = "["
     let count = 0
@@ -30,7 +32,41 @@ module.exports.getData = array => {
     }
 }
 
-module.exports.getAddonInformation = async body => {
+module.exports.getAddonInformation = async ids => {
+    if (ids.length > 50) {
+        console.log("Number of IDs too large. Grabbing 50 items at a time")
+
+        let results = []
+        let count = 0
+        let newIds = []
+
+        for (const id of ids) {
+            if (newIds.length >= 50) {
+                const grabbed = await module.exports.getAddonInformation(newIds)
+
+                results.push(...grabbed.addons)
+
+                console.log(`Parsed: ${grabbed.count}`)
+                console.log(`Count: ${results.length}`)
+
+                count += grabbed.count
+                newIds = []
+
+                console.log("Sleeping for 10 seconds")
+                await sleep(10_000)
+                continue
+            }
+
+            newIds.push(id)
+        }
+
+        return {
+            addons: results,
+            count
+        }
+    }
+
+    const body = module.exports.getData(ids).body
     const response = await fetchit("https://steamworkshopdownloader.io/api/details/file", {
         method: "POST",
         headers: {
@@ -51,12 +87,12 @@ module.exports.getAddonInformation = async body => {
             continue
         }
 
-        if (addon.children != null) {
+        if (addon.file_url === addon.preview_url) {
             const ids = addon.children.map(addon => addon.publishedfileid)
 
             console.log(`Parsing collection: ${addon.publishedfileid}`)
 
-            const grabbed = await module.exports.getAddonInformation(module.exports.getData(ids).body)
+            const grabbed = await module.exports.getAddonInformation(ids)
 
             count += grabbed.count
 

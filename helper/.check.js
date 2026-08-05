@@ -33,15 +33,13 @@ console.log(`Missing from data: ${missingFromData.length}`)
 console.log(`Missing files: ${missingFile.length}`)
 
 const awaitHack = async () => {
-	const {body} = getData(missingFromData)
-
-	if (body === "]")
+	if (getData(missingFromData).body === "]")
 		return
 
 	console.log("Getting addon information")
 	console.log("This might take a while")
 
-	const result = await getAddonInformation(body)
+	const result = await getAddonInformation(missingFromData)
 	let downloaded = 0
 
 	console.log("Saving addon information")
@@ -68,13 +66,9 @@ awaitHack().then(() => {
     }
 
     const awaitHack2 = async () => {
-		let {body} = getData(missingFile)
-
-		console.log(body)
-
     	console.log("Getting addon information")
 
-    	const result = await getAddonInformation(body)
+    	const result = await getAddonInformation(missingFile)
 
     	let downloaded = 0
 
