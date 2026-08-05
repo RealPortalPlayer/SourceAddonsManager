@@ -109,10 +109,12 @@ module.exports.getAddonInformation = async ids => {
 
         const parsedTags = []
 
-        for (const tag of addon.tags)
-            parsedTags.push({
-                tag: tag.tag
-            })
+        if (addon.tags != null) {
+            for (const tag of addon.tags)
+                parsedTags.push({
+                    tag: tag.tag
+                })
+        }
 
         results.push({
             publishedfileid: addon.publishedfileid,
