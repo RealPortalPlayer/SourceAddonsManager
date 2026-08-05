@@ -36,6 +36,7 @@ module.exports.getAddonInformation = async ids => {
     if (ids.length > 50) {
         console.log("Number of IDs too large. Grabbing 50 items at a time")
 
+        let firstCall = true
         let results = []
         let count = 0
         let newIds = []
@@ -44,11 +45,32 @@ module.exports.getAddonInformation = async ids => {
             if (newIds.length === 0)
                 return
 
+            if (!firstCall) {
+                console.log("Sleeping for 10 seconds")
+                await sleep(10_000)
+            }
+
+            firstCall = false
+
             console.log(`Parsing: ${newIds.length} addons`)
 
             const grabbed = await module.exports.getAddonInformation(newIds)
 
             results.push(...grabbed.addons)
+
+            if (grabbed.count !== newIds.length) {
+                const deadIds = newIds.filter(id => !grabbed.addons.includes(id))
+
+                console.log("RIP the following IDs")
+                console.log(deadIds.join("\n"))
+
+                for (const id of deadIds) {
+                    results.push({
+                        publishedfileid: id,
+                        result: 9
+                    })
+                }
+            }
 
             console.log(`Parsed: ${grabbed.count}`)
             console.log(`Count: ${results.length}`)
@@ -56,8 +78,6 @@ module.exports.getAddonInformation = async ids => {
             count += grabbed.count
             newIds = []
 
-            console.log("Sleeping for 10 seconds")
-            await sleep(10_000)
         }
 
         for (const id of ids) {
