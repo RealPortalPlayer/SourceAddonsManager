@@ -7,7 +7,7 @@ const {readdirSync, existsSync} = require("fs")
 const Logger = require("./internal/logger")
 const Game = require("./internal/game")
 const Manager = require("./internal/manager")
-const Paths = require("./internal/paths");
+const Paths = require("./internal/paths")
 const FilesystemWrapper = require("./internal/filesystem_wrapper")
 
 const main = async () => {
