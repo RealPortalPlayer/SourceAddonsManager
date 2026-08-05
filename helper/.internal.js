@@ -40,26 +40,36 @@ module.exports.getAddonInformation = async ids => {
         let count = 0
         let newIds = []
 
-        for (const id of ids) {
-            if (newIds.length >= 50) {
-                const grabbed = await module.exports.getAddonInformation(newIds)
+        const parseIds = async () => {
+            if (newIds.length === 0)
+                return
 
-                results.push(...grabbed.addons)
+            console.log(`Parsing: ${newIds.length} addons`)
 
-                console.log(`Parsed: ${grabbed.count}`)
-                console.log(`Count: ${results.length}`)
+            const grabbed = await module.exports.getAddonInformation(newIds)
 
-                count += grabbed.count
-                newIds = []
+            results.push(...grabbed.addons)
 
-                console.log("Sleeping for 10 seconds")
-                await sleep(10_000)
-                continue
-            }
+            console.log(`Parsed: ${grabbed.count}`)
+            console.log(`Count: ${results.length}`)
 
-            newIds.push(id)
+            count += grabbed.count
+            newIds = []
+
+            console.log("Sleeping for 10 seconds")
+            await sleep(10_000)
         }
 
+        for (const id of ids) {
+            newIds.push(id)
+
+            if (newIds.length < 50)
+                continue
+
+            await parseIds()
+        }
+
+        await parseIds()
         return {
             addons: results,
             count
