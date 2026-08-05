@@ -27,23 +27,21 @@ const fetchit = async (url, data) => {
     }
 }
 
-const body = new URLSearchParams()
+let body = "["
 let count = 0
 
 process.argv.shift()
 process.argv.shift()
 
-body.append("itemcount", 0)
-
 for (let i = 0; i < process.argv.length; i++) {
 	if (existsSync(`./${process.argv[i]}.vpk`))
 		continue
 
-	body.append(`publishedfileids[${count}]`, process.argv[i])
+	body += `${process.argv[i]},`
 	count++
 }
 
-body.set("itemcount", count)
+body = `${body.substring(0, body.length - 1)}]`
 
 const awaitHack = async () => {
 	if (count === 0) {
@@ -53,7 +51,7 @@ const awaitHack = async () => {
 
 	console.log("Getting addon information")
 
-	const response = await fetchit("https://api.steampowered.com/ISteamRemoteStorage/GetPublishedFileDetails/v1/", {
+	const response = await fetchit("https://steamworkshopdownloader.io/api/details/file", {
 		method: "POST",
 		headers: {
 			"Content-Type": "application/x-www-form-urlencoded"
@@ -71,7 +69,7 @@ const awaitHack = async () => {
 	let looped = 0
 	let downloaded = 0
 
-	for (const addon of json.response.publishedfiledetails) {
+	for (const addon of json) {
 		if (addon.result !== 1) {
 			console.log(`RIP: ${addon.publishedfileid}`)
 			continue
@@ -84,12 +82,46 @@ const awaitHack = async () => {
 
 		downloaded++
 
-		data.response.publishedfiledetails.push(addon)
+		{
+			const parsedTags = []
+
+			for (const tag of addon.tags)
+				parsedTags.push({
+					tag: tag.tag
+				})
+
+			data.response.publishedfiledetails.push({
+				publishedfiledid: addon.publishedfileid,
+				result: addon.result,
+				creator: addon.creator,
+				creator_app_id: addon.creator_appid,
+				consumer_app_id: addon.consumer_appid,
+				filename: addon.filename,
+				file_size: addon.file_size,
+				file_url: addon.file_url,
+				hcontent_file: addon.hcontent_file,
+				hcontent_preview: addon.hcontent_preview,
+				title: addon.title,
+				description: addon.description,
+				time_created: addon.time_created,
+				time_updated: addon.time_updated,
+				visibility: addon.visibility,
+				banned: addon.banned ? 1 : 0,
+				ban_reason: addon.ban_reason,
+				subscriptions: addon.subscriptions,
+				favorited: addon.favorited,
+				lifetime_subscriptions: addon.lifetime_subscriptions,
+				lifetime_favorited: addon.livetime_favorited,
+				views: addon.views,
+				tags: parsedTags
+			})
+		}
 
 		console.log(`Downloading: ${addon.publishedfileid}`)
 		writeFileSync(`./${addon.publishedfileid}.vpk`, await (await fetchit(addon.file_url)).bytes())
 
 		// idk if this is actually needed, but just in-case
+		// TODO: It isn't always a jpg
 		writeFileSync(`./${addon.publishedfileid}.jpg`, await (await fetchit(addon.preview_url)).bytes())
 	}
 
