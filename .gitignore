@@ -1,3 +1,6 @@
 .idea
 configuration.json
 data.json
+*.log
+*.vpk
+*.jpg
