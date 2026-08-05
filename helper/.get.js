@@ -17,6 +17,9 @@ if (!existsSync("./data.json"))
         }
     }))
 
+if (!existsSync("./generated_collections.json"))
+	writeFileSync("./generated_collections.json", JSON.stringify([]))
+
 process.argv.shift()
 process.argv.shift()
 

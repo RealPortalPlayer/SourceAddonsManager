@@ -4,3 +4,4 @@ data.json
 *.log
 *.vpk
 *.jpg
+generated_collections.json

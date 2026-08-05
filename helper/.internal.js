@@ -39,14 +39,37 @@ module.exports.getAddonInformation = async body => {
         body: body
     })
 
-    const json = await response.json()
+    let json = await response.json()
     let results = []
+    let collections = require("./generated_collections.json")
+    let addedCollections = []
+    let count = 0
 
     for (const addon of json) {
         if (addon.result !== 1) {
             console.log(`RIP: ${addon.publishedfileid}`)
             continue
         }
+
+        if (addon.children != null) {
+            const ids = addon.children.map(addon => addon.publishedfileid)
+
+            console.log(`Parsing collection: ${addon.publishedfileid}`)
+
+            const grabbed = await module.exports.getAddonInformation(module.exports.getData(ids).body)
+
+            count += grabbed.count
+
+            results.push(...grabbed.addons)
+            addedCollections.push({
+                name: addon.title,
+                generated: true,
+                ids
+            })
+            continue
+        }
+
+        count++
 
         const parsedTags = []
 
@@ -83,9 +106,14 @@ module.exports.getAddonInformation = async body => {
         })
     }
 
+    if (addedCollections.length !== 0) {
+        collections.push(...addedCollections)
+        writeFileSync("./generated_collections.json", JSON.stringify(collections))
+    }
+
     return {
         addons: results,
-        count: json.length
+        count
     }
 }
 
